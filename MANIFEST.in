@@ -1,0 +1,6 @@
+include CHANGELOG
+include LICENSE
+include README.rst
+recursive-include examples *.py
+recursive-include tests *.py
+recursive-include mpl_data_cast *.css *.png *.py *.svg *.theme *.ui COPYING* LICENSE README
