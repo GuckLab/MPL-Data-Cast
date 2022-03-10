@@ -6,19 +6,19 @@ import tempfile
 import uuid
 
 
-class Converter(ABC):
-    def __init__(self, path_raw, path_con):
+class Pipeline(ABC):
+    def __init__(self, path_raw, path_tar):
         """Base class for data conversion
 
         Parameters
         ----------
         path_raw: str or pathlib.Path
-            Directory containing raw experimental data
-        path_con: str or pathlib.Path
+            Directory tree containing raw experimental data
+        path_tar: str or pathlib.Path
             Target directory for converted data
         """
         self.path_raw = pathlib.Path(path_raw)
-        self.path_con = pathlib.Path(path_con)
+        self.path_con = pathlib.Path(path_tar)
         if not self.path_raw.exists():
             raise ValueError(f"Raw data path '{self.path_raw}' doesn't exist!")
         if not self.path_con.exists():
@@ -31,9 +31,11 @@ class Converter(ABC):
 
     @property
     def format(self):
+        """The dataset format (defined by class name)"""
         return self.__class__.__name__
 
     def convert(self):
+        """Convert the entire data tree"""
         dataset_list = self.get_raw_data_list()
         for ii, path_list in enumerate(dataset_list):
             targ_path = self.get_target_path(path_list)
@@ -52,12 +54,18 @@ class Converter(ABC):
 
         Returns
         -------
-        raw_data_path: list
-            list containing lists where each item contains all files
-            that belong to one dataset.
+        raw_data_paths: list
+            list (containing lists of pathlib.Path) of which
+            each item contains all files that belong to one dataset.
         """
 
     def get_target_path(self, path_list):
+        """Get the target path for a path_list
+
+        The target path is computed such that the relative paths
+        - self.path_raw - path_list[0]
+        - self.path_tar - target_path
+        """
         # TODO:
         #  - relative path of path_list[0] to self.path_raw on top of path_con
         pass
