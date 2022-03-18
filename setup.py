@@ -28,7 +28,7 @@ setup(
         "dclab>=0.39.15",
         "h5py>=2.8.0",
         "numpy>=1.21",  # CVE-2021-33430
-        "pyqt5"
+        "pyqt6"
     ],
     python_requires='>=3.8, <4',
     entry_points={

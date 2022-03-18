@@ -17,22 +17,21 @@ class Pipeline(ABC):
         path_tar: str or pathlib.Path
             Target directory for converted data
         """
+        #: The dataset format (defined by class name)
+        self.format = self.__name__
+        #: Path to raw data tree
         self.path_raw = pathlib.Path(path_raw)
-        self.path_con = pathlib.Path(path_tar)
+        #: path to target data tree
+        self.path_tar = pathlib.Path(path_tar)
         if not self.path_raw.exists():
             raise ValueError(f"Raw data path '{self.path_raw}' doesn't exist!")
-        if not self.path_con.exists():
-            raise ValueError(f"Target path '{self.path_con}' doesn't exist!")
+        if not self.path_tar.exists():
+            raise ValueError(f"Target path '{self.path_tar}' doesn't exist!")
         if not self.get_raw_data_list():
             raise ValueError(f"No raw data files found matching {self.format}")
         #: Temporary directory (will be deleted upon application exit)
         self.tempdir = pathlib.Path(tempfile.mktemp("MPL-Data-Cast_"))
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
-
-    @property
-    def format(self):
-        """The dataset format (defined by class name)"""
-        return self.__class__.__name__
 
     def convert(self):
         """Convert the entire data tree"""
