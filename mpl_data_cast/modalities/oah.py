@@ -4,7 +4,7 @@ from ..helper import is_valid_h5_file, h5_file_contains
 from ..pipeline import Pipeline
 
 
-class DHMPipeline(Pipeline):
+class OffAxisHolographyPipeline(Pipeline):
     """Matlab file format (TopogMap.mat) for DHM data"""
 
     def convert_dataset(self, path_list, temp_path):
