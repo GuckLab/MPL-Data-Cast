@@ -1,2 +1,3 @@
 # flake8: noqa: F401
-from .pipeline import Pipeline
+from .recipe import Recipe
+from . import modalities

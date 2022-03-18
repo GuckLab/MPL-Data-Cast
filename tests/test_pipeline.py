@@ -19,7 +19,7 @@ def make_example_data():
     return td
 
 
-class DummyPipeline(Pipeline):
+class DummyRecipe(Pipeline):
     """A pipeline that just concatenates text files"""
     def convert_dataset(self, path_list, temp_path):
         data = ""
@@ -40,7 +40,7 @@ class DummyPipeline(Pipeline):
 def test_pipeline_init():
     path_raw = make_example_data()
     path_tar = pathlib.Path(tempfile.mkdtemp()) / "test"
-    pl = DummyPipeline(path_raw, path_tar)
+    pl = DummyRecipe(path_raw, path_tar)
     assert pl.tempdir.exists()
     assert pl.format == "DummyPipeline"
     assert not path_tar.exists()
@@ -49,7 +49,7 @@ def test_pipeline_init():
 def test_pipeline_cast():
     path_raw = make_example_data()
     path_tar = pathlib.Path(tempfile.mkdtemp()) / "test"
-    pl = DummyPipeline(path_raw, path_tar)
+    pl = DummyRecipe(path_raw, path_tar)
     pl.cast()
     text1 = (path_tar / "hans" / "peter" / "a.txt").read_text()
     assert text1 == "hello world!"
@@ -61,7 +61,7 @@ def test_pipeline_get_target_path():
     path_raw = make_example_data()
     path_tar = pathlib.Path(tempfile.mkdtemp()) / "test"
     path_tar.mkdir()
-    pl = DummyPipeline(path_raw, path_tar)
+    pl = DummyRecipe(path_raw, path_tar)
 
     tar1 = path_tar / "fliege" / "1.txt"
     assert str(pl.get_target_path(pl.get_raw_data_list()[0])) == str(tar1)

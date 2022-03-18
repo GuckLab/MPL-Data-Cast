@@ -8,9 +8,9 @@ import uuid
 from .util import hashfile
 
 
-class Pipeline(ABC):
+class Recipe(ABC):
     def __init__(self, path_raw, path_tar):
-        """Base class for data conversion
+        """Base class recipe for data conversion
 
         Parameters
         ----------
@@ -123,3 +123,18 @@ class Pipeline(ABC):
             # compare md5hashes (verification)
             success = hash_ok == hash_cp
         return success
+
+
+def guess_recipe(path_raw):
+    """Guess the best data processing recipe for a raw data tree
+
+    This is done by counting the files returned by `get_raw_data_list`
+    for each recipe.
+    """
+    score = []
+    path_tar = tempfile.mkdtemp()
+    for cls in Recipe.__subclasses__():
+        count = len(cls(path_raw, path_tar).get_raw_data_list())
+        score.append([count, cls])
+    score = sorted(score)
+    return score[-1][1]

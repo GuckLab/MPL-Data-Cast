@@ -2,10 +2,10 @@ import dclab
 import dclab.cli
 
 
-from ..pipeline import Pipeline
+from ..recipe import Pipeline
 
 
-class RTDCPipeline(Pipeline):
+class RTDCRecipe(Pipeline):
     def convert_dataset(self, path_list, temp_path):
         """Compress the dataset using dclab"""
         # first compress the .rtdc file
