@@ -2,7 +2,6 @@
 import functools
 import hashlib
 import pathlib
-import warnings
 
 
 def hashfile(fname, blocksize=65536, count=0, constructor=hashlib.md5):

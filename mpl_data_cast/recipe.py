@@ -103,7 +103,7 @@ class Recipe(ABC):
                         or hashfile(target_path) != hash_ok):
                     # The file is not the same, delete it and try again.
                     target_path.unlink()
-                    success = Pipeline.transfer_to_target_path(
+                    success = Recipe.transfer_to_target_path(
                         temp_path=temp_path,
                         target_path=target_path,
                         check_existing=False
