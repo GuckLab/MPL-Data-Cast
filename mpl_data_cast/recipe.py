@@ -68,6 +68,16 @@ class Recipe(ABC):
 
         - self.path_raw - path_list[0]
         - self.path_tar - target_path
+
+        Parameters
+        ----------
+        path_list: list of pathlib.Path
+            the input paths corresponding to a dataset
+
+        Returns
+        -------
+        target_path: pathlib.Path
+            the output path
         """
         prel = path_list[0].relative_to(self.path_raw)
         target_path = self.path_tar / prel

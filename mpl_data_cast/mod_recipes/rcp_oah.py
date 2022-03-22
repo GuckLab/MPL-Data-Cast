@@ -51,3 +51,9 @@ class OffAxisHolographyRecipe(Recipe):
                     and h5_file_contains(pp, "lambda")):
                 datalist.append([pp])
         return datalist
+
+    def get_target_path(self, path_list):
+        """Get the target path .h5 for a path_list"""
+        target_mat = super(OffAxisHolographyRecipe,
+                           self).get_target_path(path_list)
+        return target_mat.with_suffix(".h5")
