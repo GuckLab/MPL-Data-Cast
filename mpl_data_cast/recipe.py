@@ -135,7 +135,7 @@ class Recipe(ABC):
         return success
 
 
-def guess_recipe(path_raw):
+def guess_recipe_name_for_path(path_raw):
     """Guess the best data processing recipe for a raw data tree
 
     This is done by counting the files returned by `get_raw_data_list`
@@ -147,4 +147,25 @@ def guess_recipe(path_raw):
         count = len(cls(path_raw, path_tar).get_raw_data_list())
         score.append([count, cls])
     score = sorted(score)
-    return score[-1][1]
+    return map_class_to_recipe_name(score[-1][1])
+
+
+def get_available_recipe_names():
+    names = []
+    for cls in Recipe.__subclasses__():
+        names.append(map_class_to_recipe_name(cls))
+    return sorted(names)
+
+
+def map_class_to_recipe_name(cls):
+    cls_name = cls.__name__
+    assert cls_name.endswith("Recipe")
+    return cls_name[:-6]
+
+
+def map_recipe_name_to_class(recipe_name):
+    for cls in Recipe.__subclasses__():
+        if cls.__name__.lower() == recipe_name.lower() + "recipe":
+            return cls
+    else:
+        raise KeyError(f"Could not find class recipe for '{recipe_name}'!")

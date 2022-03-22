@@ -1,2 +1,4 @@
 # flake8: noqa: F401
-from .rcp_oah import OffAxisHolographyRecipe
+# import recipes here so they get are defined and available
+from .rcp_oah import OAHRecipe
+from .rcp_qlsi import QLSIRecipe

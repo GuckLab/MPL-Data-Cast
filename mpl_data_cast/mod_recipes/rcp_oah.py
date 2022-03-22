@@ -5,7 +5,7 @@ from ..helper import is_valid_h5_file, h5_file_contains
 from ..recipe import Recipe
 
 
-class OffAxisHolographyRecipe(Recipe):
+class OAHRecipe(Recipe):
     """Matlab file format (TopogMap.mat) for DHM data"""
 
     def convert_dataset(self, path_list, temp_path):
@@ -42,6 +42,10 @@ class OffAxisHolographyRecipe(Recipe):
                 ds.attrs.create('IMAGE_SUBCLASS',
                                 np.string_('IMAGE_GRAYSCALE'))
 
+            # write qpformat metadata identifier
+            h5.attrs["file_format"] = "qpformat"
+            h5.attrs["imaging_modality"] = "off-axis holography"
+
     def get_raw_data_list(self):
         datalist = []
         for pp in sorted(self.path_raw.rglob("*.mat")):
@@ -54,6 +58,5 @@ class OffAxisHolographyRecipe(Recipe):
 
     def get_target_path(self, path_list):
         """Get the target path .h5 for a path_list"""
-        target_mat = super(OffAxisHolographyRecipe,
-                           self).get_target_path(path_list)
+        target_mat = super(OAHRecipe, self).get_target_path(path_list)
         return target_mat.with_suffix(".h5")

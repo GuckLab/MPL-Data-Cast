@@ -2,12 +2,23 @@ import pathlib
 
 import click
 
-from .recipe import Recipe, guess_recipe
+from . import recipe as mpldc_recipe
 
 
 @click.group()
 def cli():
     pass
+
+
+@cli.command(short_help="List available recipes")
+def list_recipes():
+    recipes = mpldc_recipe.get_available_recipe_names()
+    col1len = max(len(r) for r in recipes) + 2
+    for rec in recipes:
+        cls = mpldc_recipe.map_recipe_name_to_class(rec)
+        col1 = rec + (" " * (col1len - len(rec)))
+        doc = cls.__doc__.split("\n")[0]
+        click.secho(f"{col1} {doc}")
 
 
 @cli.command(short_help="Convert and copy experimental data")
@@ -30,16 +41,11 @@ def cast(path_raw, path_target, recipe="guess"):
     copy them to PATH_TARGET.
     """
     if recipe == "guess":
-        recipe = guess_recipe(path_raw).__name__
+        recipe = mpldc_recipe.guess_recipe_name_for_path(path_raw)
         click.secho(f"Using recipe '{recipe}'", bold=True)
 
     # get the actual class
-    for cls in Recipe.__subclasses__():
-        if cls.__name__ == recipe:
-            pcls = cls
-            break
-    else:
-        raise ValueError(f"Could not find recipe {recipe}")
+    pcls = mpldc_recipe.map_recipe_name_to_class(recipe)
 
     pl = pcls(path_raw, path_target)
     pl.cast()

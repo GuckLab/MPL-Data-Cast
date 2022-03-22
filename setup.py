@@ -30,6 +30,7 @@ setup(
         "h5py>=2.8.0",
         "numpy>=1.21",  # CVE-2021-33430
         "pyqt6",
+        "tifffile==2022.3.16",
     ],
     python_requires='>=3.9, <4',
     entry_points={
