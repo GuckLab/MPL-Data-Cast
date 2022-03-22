@@ -1,3 +1,3 @@
 # flake8: noqa: F401
 from .recipe import Recipe
-from . import modalities
+from . import mod_recipes
