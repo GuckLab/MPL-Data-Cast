@@ -32,18 +32,14 @@ def list_recipes():
                                 writable=True,
                                 resolve_path=True,
                                 path_type=pathlib.Path))
-@click.option("--recipe", type=str, default="guess",
-              help="specifies recipe to use, e.g. 'OffAxisHolographyRecipe'")
+@click.option("--recipe", type=str, default="CatchAll",
+              help="specifies recipe to use, e.g. 'OAH'")
 def cast(path_raw, path_target, recipe="guess"):
     """Cast data from a source directory to a target directory
 
     This will convert all data under the tree in PATH_RAW and
     copy them to PATH_TARGET.
     """
-    if recipe == "guess":
-        recipe = mpldc_recipe.guess_recipe_name_for_path(path_raw)
-        click.secho(f"Using recipe '{recipe}'", bold=True)
-
     # get the actual class
     pcls = mpldc_recipe.map_recipe_name_to_class(recipe)
 

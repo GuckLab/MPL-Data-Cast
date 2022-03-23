@@ -1,3 +1,4 @@
+import hashlib
 from abc import ABC, abstractmethod
 import atexit
 import pathlib
@@ -38,7 +39,7 @@ class Recipe(ABC):
         dataset_list = self.get_raw_data_list()
         for ii, path_list in enumerate(dataset_list):
             targ_path = self.get_target_path(path_list)
-            temp_path = self.tempdir / f"{ii}_{uuid.uuid4()}_{targ_path.name}"
+            temp_path = self.get_temp_path(path_list)
             self.convert_dataset(path_list=path_list, temp_path=temp_path)
             ok = self.transfer_to_target_path(temp_path=temp_path,
                                               target_path=targ_path)
@@ -83,6 +84,12 @@ class Recipe(ABC):
         target_path = self.path_tar / prel
         target_path.parent.mkdir(parents=True, exist_ok=True)
         return target_path
+
+    def get_temp_path(self, path_list):
+        """Return a unique temporary file name"""
+        hash1 = hashlib.md5(str(path_list[0]).encode("utf-8")).hexdigest()
+        self.tempdir.mkdir(parents=True, exist_ok=True)
+        return self.tempdir / f"{hash1}_{uuid.uuid4()}_{path_list[0].name}"
 
     @staticmethod
     def transfer_to_target_path(temp_path, target_path,

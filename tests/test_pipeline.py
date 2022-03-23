@@ -1,7 +1,7 @@
 import pathlib
 import tempfile
 
-from mpl_data_cast import Pipeline
+from mpl_data_cast import Recipe
 
 
 def make_example_data():
@@ -19,7 +19,7 @@ def make_example_data():
     return td
 
 
-class DummyRecipe(Pipeline):
+class DummyRecipe(Recipe):
     """A pipeline that just concatenates text files"""
     def convert_dataset(self, path_list, temp_path):
         data = ""
@@ -42,7 +42,7 @@ def test_pipeline_init():
     path_tar = pathlib.Path(tempfile.mkdtemp()) / "test"
     pl = DummyRecipe(path_raw, path_tar)
     assert pl.tempdir.exists()
-    assert pl.format == "DummyPipeline"
+    assert pl.format == "DummyRecipe"
     assert not path_tar.exists()
 
 
