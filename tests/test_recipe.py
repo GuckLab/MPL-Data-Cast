@@ -27,7 +27,7 @@ class DummyRecipe(Recipe):
             data += pp.read_text()
         temp_path.write_text(data)
 
-    def get_raw_data_list(self):
+    def get_raw_data_iterator(self):
         data_list = []
         for pp in self.path_raw.rglob("*"):
             if pp.is_dir():
@@ -64,7 +64,7 @@ def test_pipeline_get_target_path():
     pl = DummyRecipe(path_raw, path_tar)
 
     tar1 = path_tar / "fliege" / "1.txt"
-    assert str(pl.get_target_path(pl.get_raw_data_list()[0])) == str(tar1)
+    assert str(pl.get_target_path(pl.get_raw_data_iterator()[0])) == str(tar1)
 
     tar2 = path_tar / "hans" / "peter" / "a.txt"
-    assert str(pl.get_target_path(pl.get_raw_data_list()[1])) == str(tar2)
+    assert str(pl.get_target_path(pl.get_raw_data_iterator()[1])) == str(tar2)

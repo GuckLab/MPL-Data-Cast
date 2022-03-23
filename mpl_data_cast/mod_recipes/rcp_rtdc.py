@@ -18,9 +18,8 @@ class RTDCRecipe(Recipe):
                     lines = [ll.rstrip() for ll in lines]
                     hw.store_log(pp.name, lines)
 
-    def get_raw_data_list(self):
+    def get_raw_data_iterator(self):
         """Get list of .rtdc files including associated files"""
-        raw_data_paths = []
         for pp in self.path_raw.rglob("*.rtdc"):
             path_list = [pp]
             # search for matching SoftwareSettings.ini files
@@ -29,5 +28,4 @@ class RTDCRecipe(Recipe):
                     pp.name.split("_")[0]+"_SoftwareSettings.ini")
                 if pini.exists():
                     path_list.append(pini)
-            raw_data_paths.append(path_list)
-        return raw_data_paths
+            yield [path_list]

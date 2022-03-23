@@ -46,15 +46,13 @@ class OAHRecipe(Recipe):
             h5.attrs["file_format"] = "qpformat"
             h5.attrs["imaging_modality"] = "off-axis holography"
 
-    def get_raw_data_list(self):
-        datalist = []
+    def get_raw_data_iterator(self):
         for pp in sorted(self.path_raw.rglob("*.mat")):
             if (is_valid_h5_file(pp)
                 and h5_file_contains(pp, "topogMap")
                 and h5_file_contains(pp, "res")
                     and h5_file_contains(pp, "lambda")):
-                datalist.append([pp])
-        return datalist
+                yield [pp]
 
     def get_target_path(self, path_list):
         """Get the target path .h5 for a path_list"""

@@ -28,15 +28,13 @@ class Recipe(ABC):
         self.path_tar = pathlib.Path(path_tar)
         if not self.path_raw.exists():
             raise ValueError(f"Raw data path '{self.path_raw}' doesn't exist!")
-        if not self.get_raw_data_list():
-            raise ValueError(f"No raw data files found matching {self.format}")
         #: Temporary directory (will be deleted upon application exit)
         self.tempdir = pathlib.Path(tempfile.mkdtemp(prefix="MPL-Data-Cast_"))
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
     def cast(self):
         """Cast the entire data tree to the target directory"""
-        dataset_list = self.get_raw_data_list()
+        dataset_list = self.get_raw_data_iterator()
         for ii, path_list in enumerate(dataset_list):
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
@@ -51,13 +49,13 @@ class Recipe(ABC):
         """Implement in subclass to do conversion"""
 
     @abstractmethod
-    def get_raw_data_list(self):
+    def get_raw_data_iterator(self):
         """Return list of lists of raw data paths
 
         Returns
         -------
-        raw_data_paths: list
-            list (containing lists of pathlib.Path) of which
+        raw_data_iter: iterable of lists
+            iterator (yielding lists of pathlib.Path) of which
             each item contains all files that belong to one dataset.
         """
 
@@ -140,21 +138,6 @@ class Recipe(ABC):
             # compare md5hashes (verification)
             success = hash_ok == hash_cp
         return success
-
-
-def guess_recipe_name_for_path(path_raw):
-    """Guess the best data processing recipe for a raw data tree
-
-    This is done by counting the files returned by `get_raw_data_list`
-    for each recipe.
-    """
-    score = []
-    path_tar = tempfile.mkdtemp()
-    for cls in Recipe.__subclasses__():
-        count = len(cls(path_raw, path_tar).get_raw_data_list())
-        score.append([count, cls])
-    score = sorted(score)
-    return map_class_to_recipe_name(score[-1][1])
 
 
 def get_available_recipe_names():

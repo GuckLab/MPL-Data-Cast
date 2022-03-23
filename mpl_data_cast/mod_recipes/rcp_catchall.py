@@ -22,14 +22,12 @@ class CatchAllRecipe(Recipe):
                 raise ValueError(
                     f"Initial hash verification failed for {path_list[0]}!")
 
-    def get_raw_data_list(self):
+    def get_raw_data_iterator(self):
         ignore_list = [
             ".DS_Store",
             "._.DS_Store",
             "Thumbs.db",
         ]
-        datalist = []
-        for pp in sorted(self.path_raw.rglob("*")):
+        for pp in self.path_raw.rglob("*"):
             if not pp.is_dir() and pp.name not in ignore_list:
-                datalist.append([pp])
-        return datalist
+                yield [pp]

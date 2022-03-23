@@ -87,23 +87,21 @@ class QLSIRecipe(Recipe):
             h5.attrs["imaging_modality"] = \
                 "quadriwave lateral shearing interferometry"
 
-    def get_raw_data_list(self):
-        datalist = []
+    def get_raw_data_iterator(self):
         # This is from the preliminary data
         for pp in sorted(self.path_raw.rglob("*.tif")):
             meta_file = pp.with_name("metadata.txt")
             if meta_file.exists():
                 if meta_file.read_text().count(
                         '"ODTCamera-Camera": "33365 Retiga 2000R S/N Q33365"'):
-                    datalist.append([pp, meta_file])
+                    yield [pp, meta_file]
         # This might work in the future
         for pp in sorted(self.path_raw.rglob("*.ome")):
             meta_file = pp.with_suffix(".json")
             if meta_file.exists():
                 # check meta_file for QLSI key
                 if meta_file.read_text().count("QLSI"):
-                    datalist.append([pp, meta_file])
-        return datalist
+                    yield [pp, meta_file]
 
     def get_target_path(self, path_list):
         """Get the target path .h5 for a path_list"""
