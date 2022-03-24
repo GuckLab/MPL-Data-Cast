@@ -8,7 +8,11 @@ from ..recipe import Recipe
 class OAHRecipe(Recipe):
     """Matlab file format (TopogMap.mat) for DHM data"""
 
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path,
+                        wavelength: float = None,
+                        pixel_size: float = None,
+                        medium_index: float = None,
+                        ):
         """Convert DHM .mat data to qpformat HDF5 format"""
         with h5py.File(path_list[0]) as mat, h5py.File(temp_path, "w") as h5:
             topog = mat["topogMap"][:]
@@ -24,12 +28,22 @@ class OAHRecipe(Recipe):
                 )
                 # QPI metadata
                 ds.attrs["numerical aperture"] = mat["NA"][:].item()
-                ds.attrs["wavelength"] = mat["lambda"][:].item() * 1e-6
+
+                ds.attrs["wavelength"] = \
+                    wavelength or mat["lambda"][:].item() * 1e-6
+
                 ds.attrs["pos x"] = mat["positionVal"][0].item() * 1e-6
                 ds.attrs["pos y"] = mat["positionVal"][1].item() * 1e-6
                 ds.attrs["focus"] = mat["positionVal"][2].item() * 1e-6
-                ds.attrs["pixel size"] = mat["res"][:].item() * 1e-6
-                ds.attrs["medium index"] = 1.333
+
+                ds.attrs["pixel size"] = \
+                    pixel_size or mat["res"][:].item() * 1e-6
+
+                if "mediumIndex" in mat:  # TODO: get correct key
+                    ds.attrs["medium index"] = mat["mediumIndex"].item()
+                elif medium_index:
+                    ds.attrs["medium index"] = medium_index
+
                 if "frameRate" in mat:
                     dt = 1 / mat["frameRate"][:].item()
                     ds.attrs["time"] = ii * dt

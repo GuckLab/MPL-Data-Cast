@@ -6,7 +6,7 @@ from ..recipe import Recipe
 
 
 class RTDCRecipe(Recipe):
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path, **kwargs):
         """Compress the dataset using dclab"""
         # first compress the .rtdc file
         dclab.cli.compress(path_out=temp_path, path_in=path_list[0])

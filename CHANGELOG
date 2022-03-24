@@ -1,2 +1,5 @@
+0.2.0
+ - feat: several improvements for CLI
+ - feat: add generic catch-all recipe
 0.1.0
  - initial release

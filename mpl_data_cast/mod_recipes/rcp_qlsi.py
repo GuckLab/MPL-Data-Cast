@@ -10,7 +10,11 @@ from ..recipe import Recipe
 
 class QLSIRecipe(Recipe):
     """TIF file format from MicroManager with Phasics SID4Bio camera"""
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path,
+                        wavelength: float = None,
+                        pixel_size: float = None,
+                        medium_index: float = None,
+                        ):
         """Convert QLSI TIF data to qpformat HDF5 format"""
         # get the metadata
         meta_data_full = json.loads(path_list[1].read_text())
@@ -44,29 +48,33 @@ class QLSIRecipe(Recipe):
                     fletcher32=True,
                 )
                 # QPI metadata
-                # ds.attrs["wavelength"] = meta_data["Wavelength"]
-                warnings.warn(f"No wavelength defined for {path_list[0]}!")
 
-                if str(path_list[0]).count("532nm"):
-                    ds.attrs["wavelength"] = 532e-9
-
-                if str(path_list[0]).count("594nm"):
-                    ds.attrs["wavelength"] = 594e-9
+                if wavelength:
+                    ds.attrs["wavelength"] = wavelength
+                else:
+                    warnings.warn(f"No wavelength defined for {path_list[0]}!")
 
                 # ds.attrs["pos x"] = mat["positionVal"][0].item() * 1e-6
                 # ds.attrs["pos y"] = mat["positionVal"][1].item() * 1e-6
                 # ds.attrs["focus"] = mat["positionVal"][2].item() * 1e-6
                 warnings.warn(f"No XYZ position defined for {path_list[0]}!")
 
-                px_size = meta_data.get("PixelSize_um", 0) * 1e-6
-                if px_size == 0:
-                    warnings.warn(
-                        f"No pixel size defined for {path_list[0]}!")
+                if pixel_size:
+                    ds.attrs["pixel size"] = pixel_size
                 else:
-                    ds.attrs["pixel size"] = px_size
+                    px_size = meta_data.get("PixelSize_um", 0) * 1e-6
+                    if px_size == 0:
+                        warnings.warn(
+                            f"No pixel size defined for {path_list[0]}!")
+                    else:
+                        ds.attrs["pixel size"] = px_size
 
-                ds.attrs["medium index"] = 1.333
-                warnings.warn(f"No medium index defined for {path_list[0]}!")
+                if medium_index:
+                    ds.attrs["medium index"] = medium_index
+                else:
+                    ds.attrs["medium index"] = 1.333
+                    warnings.warn(
+                        f"No medium index defined for {path_list[0]}!")
 
                 ds.attrs["date"] = meta_data_full["Summary"]["Date"]
 

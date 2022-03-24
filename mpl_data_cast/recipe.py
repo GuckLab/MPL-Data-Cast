@@ -32,20 +32,21 @@ class Recipe(ABC):
         self.tempdir = pathlib.Path(tempfile.mkdtemp(prefix="MPL-Data-Cast_"))
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
-    def cast(self):
+    def cast(self, **kwargs):
         """Cast the entire data tree to the target directory"""
         dataset_list = self.get_raw_data_iterator()
         for ii, path_list in enumerate(dataset_list):
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
-            self.convert_dataset(path_list=path_list, temp_path=temp_path)
+            self.convert_dataset(path_list=path_list, temp_path=temp_path,
+                                 **kwargs)
             ok = self.transfer_to_target_path(temp_path=temp_path,
                                               target_path=targ_path)
             if not ok:
                 raise ValueError(f"Creation of {temp_path} failed!")
 
     @abstractmethod
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path, **kwargs):
         """Implement in subclass to do conversion"""
 
     @abstractmethod

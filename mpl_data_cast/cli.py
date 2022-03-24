@@ -1,3 +1,4 @@
+import inspect
 import pathlib
 
 import click
@@ -32,16 +33,42 @@ def list_recipes():
                                 writable=True,
                                 resolve_path=True,
                                 path_type=pathlib.Path))
-@click.option("--recipe", type=str, default="CatchAll",
+@click.option("-r", "--recipe", type=str, default="CatchAll",
               help="specifies recipe to use, e.g. 'OAH'")
-def cast(path_raw, path_target, recipe="guess"):
+@click.option("-o", "--options", type=str, default=None,
+              help="comma-separated keyword arguments passed to the recipe's "
+                   + "`convert_dataset` method, e.g. "
+                   + "wavelength=984e-9,pixel_size=1.2e-6")
+def cast(path_raw, path_target, recipe="CatchAll", options=None):
     """Cast data from a source directory to a target directory
 
     This will convert all data under the tree in PATH_RAW and
     copy them to PATH_TARGET.
     """
     # get the actual class
-    pcls = mpldc_recipe.map_recipe_name_to_class(recipe)
+    rcls = mpldc_recipe.map_recipe_name_to_class(recipe)
+    # instantiate the class
+    rp = rcls(path_raw, path_target)
 
-    pl = pcls(path_raw, path_target)
-    pl.cast()
+    # get types of the recipes
+    kwarg_dtypes = {}
+    sig = inspect.signature(rp.convert_dataset)
+    for p in sig.parameters:
+        if p in ["path_list", "temp_path"]:
+            continue
+        kwarg_dtypes[p] = sig.parameters[p].annotation
+
+    # parse custom parameters from `options`
+    kwargs = {}
+    if options:
+        entries = options.split(",")
+        for entr in entries:
+            if "=" not in entr:
+                raise ValueError(f"Invalid option string: '{entr}'!")
+            key, valuestr = [en.strip() for en in entr.split("=", 1)]
+            if key not in kwarg_dtypes:
+                raise ValueError("Recipe `recipe` does not implement option "
+                                 + f"'{key}'; available options: "
+                                 + f"{sorted(kwarg_dtypes.keys())}")
+            kwargs[key] = kwarg_dtypes[key](valuestr)
+    rp.cast(**kwargs)

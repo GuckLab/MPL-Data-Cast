@@ -8,7 +8,7 @@ from ..recipe import Recipe
 class CatchAllRecipe(Recipe):
     """Copy all files, except known junk files"""
 
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path, **kwargs):
         """Create a symlink and if that fails, copy the file"""
         try:
             temp_path.symlink_to(path_list[0])
