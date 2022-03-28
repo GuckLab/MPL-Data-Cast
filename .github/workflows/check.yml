@@ -3,8 +3,6 @@ name: Checks
 on:
   push:
   pull_request:
-  schedule:
-  - cron: "0 0 1 * *"
 
 jobs:
   build:
@@ -26,6 +24,9 @@ jobs:
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
         # install dependencies
+    - name: Install package
+      run: |
+        pip install -e .
     - name: List installed packages
       run: |
         pip freeze

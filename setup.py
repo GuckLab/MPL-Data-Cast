@@ -27,7 +27,7 @@ setup(
     install_requires=[
         "click>=8",
         "dclab>=0.39.15",
-        "h5py>=2.8.0",
+        "h5py>=3.6.0",
         "numpy>=1.21",  # CVE-2021-33430
         "pyqt6",
         "tifffile==2022.3.16",
