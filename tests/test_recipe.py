@@ -28,13 +28,14 @@ class DummyRecipe(Recipe):
         temp_path.write_text(data)
 
     def get_raw_data_iterator(self):
+        """Return a sorted list of files"""
         data_list = []
         for pp in self.path_raw.rglob("*"):
             if pp.is_dir():
                 files = sorted(pp.rglob("*.txt"))
                 if files:
                     data_list.append(files)
-        return data_list
+        return sorted(data_list)
 
 
 def test_pipeline_init():
