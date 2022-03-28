@@ -1,0 +1,5 @@
+ipython
+matplotlib
+sphinx==4.2.0
+sphinxcontrib.bibtex>=2.0
+sphinx_rtd_theme==1.0

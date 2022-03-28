@@ -1,7 +1,7 @@
 |MPL-Data-Cast|
 ===============
 
-|PyPI Version| |Build Status Unix| |Build Status Win| |Coverage Status| |Docs Status|
+|PyPI Version| |Build Status| |Coverage Status| |Docs Status|
 
 
 **MPL-Data-Cast**
@@ -37,10 +37,8 @@ Testing
 .. |MPL-Data-Cast| image:: https://raw.github.com/GuckLab/MPL-Data-Cast/master/docs/logo/MPL-Data-Cast_h50.png
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/MPL-Data-Cast.svg
    :target: https://pypi.python.org/pypi/MPL-Data-Cast
-.. |Build Status Unix| image:: https://img.shields.io/github/workflow/status/GuckLab/MPL-Data-Cast/Checks
+.. |Build Status| image:: https://img.shields.io/github/workflow/status/GuckLab/MPL-Data-Cast/Checks
    :target: https://github.com/GuckLab/MPL-Data-Cast/actions?query=workflow%3AChecks
-.. |Build Status Win| image:: https://img.shields.io/appveyor/build/paulmueller/MPL-Data-Cast
-   :target: https://ci.appveyor.com/project/paulmueller/MPL-Data-Cast
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/GuckLab/MPL-Data-Cast/master.svg
    :target: https://codecov.io/gh/GuckLab/MPL-Data-Cast
 .. |Docs Status| image:: https://img.shields.io/readthedocs/MPL-Data-Cast
