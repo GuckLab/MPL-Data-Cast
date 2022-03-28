@@ -11,7 +11,8 @@ def cli():
     pass
 
 
-@cli.command(short_help="List available recipes")
+@cli.command(short_help="List available recipes that can be used in the "
+                        + "``mpldc cast`` subcommand")
 def list_recipes():
     recipes = mpldc_recipe.get_available_recipe_names()
     col1len = max(len(r) for r in recipes) + 2
@@ -34,7 +35,8 @@ def list_recipes():
                                 resolve_path=True,
                                 path_type=pathlib.Path))
 @click.option("-r", "--recipe", type=str, default="CatchAll",
-              help="specifies recipe to use, e.g. 'OAH'")
+              help="specifies recipe to use, defaults to 'CatchAll'; see the "
+                   + "``mpldc list-recipes`` subcommand for more options")
 @click.option("-o", "--options", type=str, default=None,
               help="comma-separated keyword arguments passed to the recipe's "
                    + "`convert_dataset` method, e.g. "

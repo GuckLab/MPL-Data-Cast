@@ -39,5 +39,5 @@ Testing
    :target: https://github.com/GuckLab/MPL-Data-Cast/actions?query=workflow%3AChecks
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/GuckLab/MPL-Data-Cast/master.svg
    :target: https://codecov.io/gh/GuckLab/MPL-Data-Cast
-.. |Docs Status| image:: https://img.shields.io/readthedocs/MPL-Data-Cast
+.. |Docs Status| image:: https://img.shields.io/readthedocs/mpl-data-cast
    :target: https://readthedocs.org/projects/mpl-data-cast/builds/

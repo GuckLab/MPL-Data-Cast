@@ -3,12 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MPL-Data-Cast's documentation!
-=========================================
+Welcome to the MPL-Data-Cast documentation!
+===========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   sec_cli
 
 
 
