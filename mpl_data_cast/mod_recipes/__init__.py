@@ -3,3 +3,4 @@
 from .rcp_catchall import CatchAllRecipe
 from .rcp_oah import OAHRecipe
 from .rcp_qlsi import QLSIRecipe
+from .rcp_rtdc import RTDCRecipe
