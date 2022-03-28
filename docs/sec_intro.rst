@@ -1,6 +1,21 @@
 Introduction
 ============
 
+Installation
+------------
+
+If you have Python installed, you can install MPL-Data-Cast with
+
+```
+pip install mpl_data_cast
+```
+
+The :ref:`Command-line interface <sec_cli>` is available via the ``mpldc``
+command.
+
+A graphical user interface, including installers for Windows and macOS, is planned.
+
+
 Motivation
 ----------
 
