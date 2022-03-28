@@ -10,6 +10,7 @@ Welcome to the MPL-Data-Cast documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   sec_intro
    sec_cli
 
 
