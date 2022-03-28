@@ -34,8 +34,8 @@ class Recipe(ABC):
 
     def cast(self, **kwargs):
         """Cast the entire data tree to the target directory"""
-        dataset_list = self.get_raw_data_iterator()
-        for ii, path_list in enumerate(dataset_list):
+        ds_iterator = self.get_raw_data_iterator()
+        for path_list in ds_iterator:
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
             self.convert_dataset(path_list=path_list, temp_path=temp_path,
