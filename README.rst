@@ -4,13 +4,11 @@
 |PyPI Version| |Build Status| |Coverage Status| |Docs Status|
 
 
-**MPL-Data-Cast**
-
 Documentation
 -------------
 
 The documentation, including the code reference and examples, is available at
-`mpl-data-cast.readthedocs.io <https://MPL-Data-Cast.readthedocs.io>`__.
+`mpl-data-cast.readthedocs.io <https://mpl-data-cast.readthedocs.io>`__.
 
 
 Installation
@@ -42,4 +40,4 @@ Testing
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/GuckLab/MPL-Data-Cast/master.svg
    :target: https://codecov.io/gh/GuckLab/MPL-Data-Cast
 .. |Docs Status| image:: https://img.shields.io/readthedocs/MPL-Data-Cast
-   :target: https://readthedocs.org/projects/MPL-Data-Cast/builds/
+   :target: https://readthedocs.org/projects/mpl-data-cast/builds/
