@@ -6,6 +6,7 @@ from ..recipe import Recipe
 
 
 class RTDCRecipe(Recipe):
+    """Compress RT-DC data and append SoftwareSettings.ini to logs"""
     def convert_dataset(self, path_list, temp_path, **kwargs):
         """Compress the dataset using dclab and append SoftwareSettings.ini"""
         # first compress the .rtdc file
