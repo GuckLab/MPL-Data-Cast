@@ -44,13 +44,22 @@ class Recipe(ABC):
         self.tempdir = pathlib.Path(tempfile.mkdtemp(prefix="MPL-Data-Cast_"))
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
-    def cast(self, **kwargs):
-        """Cast the entire data tree to the target directory"""
+    def cast(self, path_callback=None, **kwargs):
+        """Cast the entire data tree to the target directory
+
+        Parameters
+        ----------
+        path_callback: callable
+            Callable function accepting a path; used for tracking
+            the progress (e.g. via the CLI)
+        """
         # TODO: use more efficient tree structure to keep track of known files
         known_files = []
         # Copy the raw data specified by the recipe
         ds_iterator = self.get_raw_data_iterator()
         for path_list in ds_iterator:
+            if path_callback is not None:
+                path_callback(path_list[0])
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
             self.convert_dataset(path_list=path_list, temp_path=temp_path,
@@ -68,6 +77,8 @@ class Recipe(ABC):
             elif pp in known_files:  # this might be slow
                 continue
             else:
+                if path_callback is not None:
+                    path_callback(pp)
                 prel = pp.relative_to(self.path_raw)
                 target_path = self.path_tar / prel
                 target_path.parent.mkdir(parents=True, exist_ok=True)

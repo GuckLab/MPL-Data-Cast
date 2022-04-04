@@ -1,5 +1,6 @@
 import inspect
 import pathlib
+import time
 
 import click
 
@@ -73,4 +74,41 @@ def cast(path_raw, path_target, recipe="CatchAll", options=None):
                                  + f"'{key}'; available options: "
                                  + f"{sorted(kwarg_dtypes.keys())}")
             kwargs[key] = kwarg_dtypes[key](valuestr)
-    rp.cast(**kwargs)
+    click.secho(f"Using recipe {recipe}.", bold=True)
+    with CLICallback() as path_callback:
+        rp.cast(path_callback=path_callback, **kwargs)
+    click.secho("Done.", bold=True)
+
+
+class CLICallback:
+    def __init__(self):
+        self.counter = 0
+        self.size = 0
+        self.prev_len = 0
+        self.time_start = time.monotonic()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        rate = self.get_rate()
+        self.print(f"Processed {self.counter} files (~{rate:.1f} MB/s).")
+        print("")
+
+    def __call__(self, path):
+        self.counter += 1
+        name = click.format_filename(path, shorten=True)
+        message = f"Processing file {self.counter}: {name}"
+        rate = self.get_rate()
+        if rate:
+            message += f" ({rate:.1f}MB/s)"
+        self.size += path.stat().st_size
+        self.print(message)
+
+    def get_rate(self):
+        return self.size / 1024**2 / (time.monotonic() - self.time_start)
+
+    def print(self, message):
+        print(" " * self.prev_len, end="\r")
+        print(message, end="\r")
+        self.prev_len = len(message)
