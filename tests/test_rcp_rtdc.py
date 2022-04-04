@@ -26,3 +26,14 @@ def test_rcp_rtdc_base(tmp_path):
 
     # Make sure compression worked (even with the ini file in it)
     assert pin.stat().st_size > pout.stat().st_size
+
+
+def test_rcp_rtdc_with_other_files(tmp_path):
+    path_in = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
+    # an additional file that should be copied
+    (path_in / "additional.docx").touch()
+
+    rcp = RTDCRecipe(path_raw=path_in, path_tar=tmp_path)
+    rcp.cast()
+
+    assert (tmp_path / "additional.docx").exists()

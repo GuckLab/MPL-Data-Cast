@@ -9,7 +9,19 @@ import uuid
 from .util import hashfile
 
 
+#: Files that are not copied (unless specified explicitly by a recipe)
+IGNORED_FILE_NAMES = [
+    ".DS_Store",
+    "._.DS_Store",
+    "Thumbs.db",
+]
+
+
 class Recipe(ABC):
+    #: Ignored files as specified by the recipe (an addition
+    #: to `IGNORED_FILE_NAMES`)
+    ignored_file_names = []
+
     def __init__(self, path_raw, path_tar):
         """Base class recipe for data conversion
 
@@ -34,6 +46,9 @@ class Recipe(ABC):
 
     def cast(self, **kwargs):
         """Cast the entire data tree to the target directory"""
+        # TODO: use more efficient tree structure to keep track of known files
+        known_files = []
+        # Copy the raw data specified by the recipe
         ds_iterator = self.get_raw_data_iterator()
         for path_list in ds_iterator:
             targ_path = self.get_target_path(path_list)
@@ -43,7 +58,23 @@ class Recipe(ABC):
             ok = self.transfer_to_target_path(temp_path=temp_path,
                                               target_path=targ_path)
             if not ok:
-                raise ValueError(f"Creation of {temp_path} failed!")
+                raise ValueError(f"Creation of {targ_path} failed!")
+            known_files += path_list
+        # Walk the directory tree and copy any other files
+        ignored = IGNORED_FILE_NAMES + self.ignored_file_names
+        for pp in self.path_raw.rglob("*"):
+            if pp.is_dir() or pp.name in ignored:
+                continue
+            elif pp in known_files:  # this might be slow
+                continue
+            else:
+                prel = pp.relative_to(self.path_raw)
+                target_path = self.path_tar / prel
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                ok = self.transfer_to_target_path(temp_path=pp,
+                                                  target_path=target_path)
+                if not ok:
+                    raise ValueError(f"Creation of {target_path} failed!")
 
     @abstractmethod
     def convert_dataset(self, path_list, temp_path, **kwargs):

@@ -1,3 +1,6 @@
+0.2.2
+ - fix: copy additional files not belonging to any dataset
+   to the target directory  (#11)
 0.2.1
  - fix: added docs to RTDC recipe
 0.2.0
