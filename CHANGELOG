@@ -1,3 +1,5 @@
+0.2.3
+ - fix: zero-division error when computing transfer rate (#12)
 0.2.2
  - fix: copy additional files not belonging to any dataset
    to the target directory  (#11)

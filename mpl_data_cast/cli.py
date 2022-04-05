@@ -106,7 +106,11 @@ class CLICallback:
         self.print(message)
 
     def get_rate(self):
-        return self.size / 1024**2 / (time.monotonic() - self.time_start)
+        curtime = time.monotonic()
+        if curtime > self.time_start:
+            return self.size / 1024**2 / (curtime - self.time_start)
+        else:
+            return 0
 
     def print(self, message):
         print(" " * self.prev_len, end="\r")
