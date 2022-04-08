@@ -7,6 +7,19 @@ from mpl_data_cast.mod_recipes import RTDCRecipe
 import dclab
 
 
+def test_pipeline_cast_convert_error(tmp_path):
+    path_in = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
+    name = "M002_data.rtdc"
+    (path_in / name).touch()  # an invalid rtdc file
+
+    rcp = RTDCRecipe(path_raw=path_in, path_tar=tmp_path)
+    result = rcp.cast()
+    assert not result["success"]
+    assert len(result["errors"]) == 1
+    assert name in str(result["errors"][0][0])
+    assert not (tmp_path / name).exists()
+
+
 def test_rcp_rtdc_base(tmp_path):
     path_in = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
 

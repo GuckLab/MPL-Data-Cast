@@ -4,6 +4,7 @@ import atexit
 import pathlib
 import shutil
 import tempfile
+import traceback
 import uuid
 
 from .util import hashfile
@@ -52,23 +53,34 @@ class Recipe(ABC):
         path_callback: callable
             Callable function accepting a path; used for tracking
             the progress (e.g. via the CLI)
+
+        Returns
+        -------
+        result: dict
+            Results dictionary with keys "success" (bool) and "errors"
+            (list of tuples (path, formatted traceback))
         """
+        errors = []
         # TODO: use more efficient tree structure to keep track of known files
         known_files = []
         # Copy the raw data specified by the recipe
         ds_iterator = self.get_raw_data_iterator()
         for path_list in ds_iterator:
+            known_files += path_list
             if path_callback is not None:
                 path_callback(path_list[0])
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
-            self.convert_dataset(path_list=path_list, temp_path=temp_path,
-                                 **kwargs)
+            try:
+                self.convert_dataset(path_list=path_list, temp_path=temp_path,
+                                     **kwargs)
+            except BaseException:
+                errors.append((path_list[0], traceback.format_exc()))
+                continue
             ok = self.transfer_to_target_path(temp_path=temp_path,
                                               target_path=targ_path)
             if not ok:
-                raise ValueError(f"Creation of {targ_path} failed!")
-            known_files += path_list
+                raise ValueError(f"Transfer to {targ_path} failed!")
         # Walk the directory tree and copy any other files
         ignored = IGNORED_FILE_NAMES + self.ignored_file_names
         for pp in self.path_raw.rglob("*"):
@@ -85,7 +97,11 @@ class Recipe(ABC):
                 ok = self.transfer_to_target_path(temp_path=pp,
                                                   target_path=target_path)
                 if not ok:
-                    raise ValueError(f"Creation of {target_path} failed!")
+                    raise ValueError(f"Transfer to {target_path} failed!")
+        return {
+            "success": not bool(errors),
+            "errors": errors,
+        }
 
     @abstractmethod
     def convert_dataset(self, path_list, temp_path, **kwargs):

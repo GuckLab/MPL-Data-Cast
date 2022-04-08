@@ -76,8 +76,18 @@ def cast(path_raw, path_target, recipe="CatchAll", options=None):
             kwargs[key] = kwarg_dtypes[key](valuestr)
     click.secho(f"Using recipe {recipe}.", bold=True)
     with CLICallback() as path_callback:
-        rp.cast(path_callback=path_callback, **kwargs)
-    click.secho("Done.", bold=True)
+        result = rp.cast(path_callback=path_callback, **kwargs)
+    if result["success"]:
+        click.secho("Success!", bold=True)
+    else:
+        click.secho("Errors encountered for the following files: ", bold=True)
+        for path, _ in result["errors"]:
+            click.echo(f" - {path}")
+        if click.confirm('Should I dump the tracebacks to "mpldc-dump.txt"?'):
+            text = ""
+            for path, tb in result["errors"]:
+                text += f"PATH {path}:\n{tb}\n\n"
+            pathlib.Path("mpldc-dump.txt").write_text(text)
 
 
 class CLICallback:
