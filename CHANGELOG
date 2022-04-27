@@ -1,3 +1,5 @@
+0.3.0
+ - feat: implement recipe for QLSI data from our SPIM setup
 0.2.4
  - fix: continue when encountering errors during conversion (#13)
 0.2.3
