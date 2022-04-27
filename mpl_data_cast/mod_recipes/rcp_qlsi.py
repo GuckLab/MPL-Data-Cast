@@ -10,13 +10,16 @@ from ..recipe import Recipe
 
 meta_data_mapping = {
     "pixel size": ["pixel_size", "PixelSizeUm", lambda x: x * 1e-6],
-    "medium index": ["medium_index", "MediumIndex", lambda x: x],
     "time": ["UNUSED", "ElapsedTime-ms", lambda x: x * 1e3],
     "date": ["UNUSED", "ReceivedTime", lambda x: x.split()[0]],
     "identifier": ["UNUSED", "UUID", lambda x: x],
     "pos x": ["UNUSED", "XPositionUm", lambda x: x * 1e-6],
     "pos y": ["UNUSED", "YPositionUm", lambda x: x * 1e-6],
     "focus": ["UNUSED", "ZPositionUm", lambda x: x * 1e-6],
+    # TODO
+    "wavelength": ["wavelength", "WAVELENGTH_UNDEFINED", lambda x: x]
+    "medium index": ["medium_index", "RI_UNDEFINED", lambda x: x],
+    "numerical aperture": ["UNUSED", "NA_UNDEFINED", lambda x: x],
 }
 
 
