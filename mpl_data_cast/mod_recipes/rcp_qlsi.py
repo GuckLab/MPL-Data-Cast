@@ -17,7 +17,7 @@ meta_data_mapping = {
     "pos y": ["UNUSED", "YPositionUm", lambda x: x * 1e-6],
     "focus": ["UNUSED", "ZPositionUm", lambda x: x * 1e-6],
     # TODO
-    "wavelength": ["wavelength", "WAVELENGTH_UNDEFINED", lambda x: x]
+    "wavelength": ["wavelength", "WAVELENGTH_UNDEFINED", lambda x: x],
     "medium index": ["medium_index", "RI_UNDEFINED", lambda x: x],
     "numerical aperture": ["UNUSED", "NA_UNDEFINED", lambda x: x],
 }
