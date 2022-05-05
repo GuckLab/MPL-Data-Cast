@@ -139,7 +139,6 @@ class Recipe(ABC):
         """
         prel = path_list[0].relative_to(self.path_raw)
         target_path = self.path_tar / prel
-        target_path.parent.mkdir(parents=True, exist_ok=True)
         return target_path
 
     def get_temp_path(self, path_list):
@@ -168,6 +167,7 @@ class Recipe(ABC):
         success: bool
             whether everything went as planned
         """
+        target_path.parent.mkdir(parents=True, exist_ok=True)
         # compute md5hash of temp_path
         hash_ok = hashfile(temp_path)
         if target_path.exists():
