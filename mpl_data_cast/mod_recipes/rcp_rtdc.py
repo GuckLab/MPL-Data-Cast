@@ -1,6 +1,6 @@
 import dclab
 import dclab.cli
-
+import hdf5plugin
 
 from ..recipe import Recipe
 
@@ -12,8 +12,9 @@ class RTDCRecipe(Recipe):
         # first compress the .rtdc file
         dclab.cli.compress(path_out=temp_path, path_in=path_list[0])
         # the rest of the files should be log files
+        cmp_kw = hdf5plugin.Zstd(clevel=5)
         if len(path_list) > 1:
-            with dclab.RTDCWriter(temp_path) as hw:
+            with dclab.RTDCWriter(temp_path, compression_kwargs=cmp_kw) as hw:
                 for pp in path_list[1:]:
                     lines = pp.read_text().split("\n")
                     lines = [ll.rstrip() for ll in lines]
