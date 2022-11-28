@@ -28,6 +28,7 @@ setup(
         "click>=8",
         "dclab>=0.39.15",
         "h5py>=3.6.0",
+        "hdf5plugin",  # compression
         "numpy>=1.21",  # CVE-2021-33430
         "pyqt6",
         "tifffile==2022.3.16",
