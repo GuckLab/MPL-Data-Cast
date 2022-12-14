@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>926</width>
-    <height>744</height>
+    <width>774</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -16,15 +16,21 @@
     <height>600</height>
    </size>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>MPL-Data-Cast</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="minimumSize">
     <size>
-     <width>500</width>
-     <height>500</height>
+     <width>550</width>
+     <height>550</height>
     </size>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -38,8 +44,11 @@
       <property name="minimumSize">
        <size>
         <width>500</width>
-        <height>450</height>
+        <height>500</height>
        </size>
+      </property>
+      <property name="acceptDrops">
+       <bool>false</bool>
       </property>
       <property name="toolTip">
        <string/>
@@ -55,7 +64,7 @@
         </sizepolicy>
        </property>
        <property name="acceptDrops">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RTDC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -66,24 +75,35 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
           <item>
-           <widget class="QGroupBox" name="groupBox">
-            <property name="title">
-             <string>Input</string>
-            </property>
-           </widget>
+           <widget class="InputWidget" name="widget_input" native="true"/>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_2">
-            <property name="title">
-             <string>Output</string>
-            </property>
-           </widget>
+           <widget class="OutputWidget" name="widget_output" native="true"/>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_transfer">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -108,23 +128,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_QLSI">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="acceptDrops">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;QLSI&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <attribute name="title">
-        <string>QLSI</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -134,8 +137,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>926</width>
-     <height>21</height>
+     <width>774</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -174,9 +177,23 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InputWidget</class>
+   <extends>QWidget</extends>
+   <header>mpl_data_cast.gui.widget_input</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OutputWidget</class>
+   <extends>QWidget</extends>
+   <header>mpl_data_cast.gui.widget_output</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_transfer</tabstop>
  </tabstops>
  <resources/>
  <connections/>
