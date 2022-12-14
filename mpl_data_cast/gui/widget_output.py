@@ -34,10 +34,7 @@ class OutputWidget(QtWidgets.QWidget):
             e.ignore()
 
     def dropEvent(self, e) -> None:
-        """Add dropped directory to treeview and lineedit.
-
-        todo implement transfer of single files
-        """
+        """Add dropped directory to treeview and lineedit."""
         urls = e.mimeData().urls()
         file_1 = urls[0]
         pp = pathlib.Path(file_1.toLocalFile())
@@ -47,8 +44,6 @@ class OutputWidget(QtWidgets.QWidget):
             path_output = pp.parent
 
         self.update_output_dir(path_output)
-        # todo update lineEdit
-        # todo update tree view
 
     def update_output_dir(self, output_dir):
         output_dir = pathlib.Path(output_dir)

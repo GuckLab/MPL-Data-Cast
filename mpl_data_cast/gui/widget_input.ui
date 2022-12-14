@@ -77,7 +77,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTreeView" name="treeView">
+         <widget class="QTreeView" name="treeView_input">
           <property name="acceptDrops">
            <bool>true</bool>
           </property>

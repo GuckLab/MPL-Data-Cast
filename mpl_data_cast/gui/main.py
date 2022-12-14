@@ -38,8 +38,8 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.path_target = None
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
-        # connect the lineEdit editingFinished() signal to the function to
-        # update the text displayed in the lineEdit element
+        # todo connect the lineEdit editingFinished() signal to the function to
+        #  update the text displayed in the lineEdit element
         # self.lineEdit_input.textEdited.connect(self.update_input_dir())
         # GUI
         self.setWindowTitle(f"MPL-Data-Cast {__version__}")
