@@ -104,7 +104,11 @@ class MPLDataCast(QtWidgets.QMainWindow):
         # instantiate the class
         rp = RTDCRecipe(self.widget_input.path, self.widget_output.path)
 
-        with Callback(self) as path_callback:
+        nb_files = 0
+        for elem in self.widget_input.path.rglob("*.*"):
+            if elem.is_file():
+                nb_files += 1
+        with Callback(self, nb_files) as path_callback:
             result = rp.cast(path_callback=path_callback)
         if result["success"]:
             QtWidgets.QMessageBox.information(self, "Transfer completed",
@@ -124,11 +128,11 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
 
 class Callback:
-    def __init__(self, gui):
+    def __init__(self, gui, max_count):
         self.gui = gui
         self.counter = 0
+        self.max_count = max_count
         self.size = 0
-        self.prev_len = 0
         self.time_start = time.monotonic()
 
     def __enter__(self):
@@ -140,7 +144,9 @@ class Callback:
     def __call__(self, path):
         self.counter += 1
         self.size += path.stat().st_size
-        self.gui.progressBar.setValue(int(self.counter/self.size * 100))
+        self.gui.progressBar.setValue(int(self.counter/self.max_count * 100))
+        QtWidgets.QApplication.processEvents(
+            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
 
     def get_rate(self):
         curtime = time.monotonic()
