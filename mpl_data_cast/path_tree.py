@@ -65,6 +65,5 @@ def list_items_in_tree(p_tree, tree_widget, h_level=0):
         item = QtWidgets.QTreeWidgetItem(tree_widget)
         item.setText(h_level + 1, file.name)
     if p_tree.children:
-        print(p_tree.children)
         for child_tree in p_tree.children.values():
             list_items_in_tree(child_tree, tree_widget, h_level+1)
