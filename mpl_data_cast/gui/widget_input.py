@@ -2,6 +2,8 @@ from PyQt6 import QtWidgets, QtCore, uic
 import pkg_resources
 import pathlib
 
+from ..path_tree import PathTree, list_items_in_tree
+
 
 class InputPathError(BaseException):
     pass
@@ -12,6 +14,7 @@ class InputWidget(QtWidgets.QWidget):
     Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
         self.path = None
+        self.p_tree = None
         super(InputWidget, self).__init__(*args, **kwargs)
 
         QtWidgets.QMainWindow.__init__(self)
@@ -69,7 +72,19 @@ class InputWidget(QtWidgets.QWidget):
         if input_dir.exists():
             self.path = input_dir
             self.lineEdit_input.setText(str(input_dir))
-            # todo update treeview
+            self.update_tree()
         else:
             raise InputPathError("The input directory is not valid, it "
                                  "does not seem to exist.")
+
+    def update_tree(self):
+        self.p_tree = PathTree(self.path)
+        self.treeWidget_input.clear()
+        self.treeWidget_input.setColumnCount(self.p_tree.tree_depth + 2)
+
+        list_items_in_tree(self.p_tree,
+                           self.treeWidget_input,
+                           h_level=0)
+
+        QtWidgets.QApplication.processEvents(
+            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)

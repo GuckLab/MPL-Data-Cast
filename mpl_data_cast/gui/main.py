@@ -113,6 +113,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
             self.progressBar.setValue(0)
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+            self.widget_output.update_tree()
         else:
             msg = "Some problems occured during data transfer:\n"
             for path, _ in result["errors"]:
@@ -196,6 +197,7 @@ def error(message, info=None, details=None):
     if details:
         msg.setDetailedText(details)
     msg.exec()
+
 
 # Display exception hook in separate dialog instead of crashing
 sys.excepthook = excepthook

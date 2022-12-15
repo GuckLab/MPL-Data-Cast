@@ -78,14 +78,26 @@
         </item>
         <item>
          <widget class="QTreeWidget" name="treeWidget_input">
+          <property name="cursor" stdset="0">
+           <cursorShape>ArrowCursor</cursorShape>
+          </property>
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
           <property name="dragDropMode">
-           <enum>QAbstractItemView::DropOnly</enum>
+           <enum>QAbstractItemView::NoDragDrop</enum>
           </property>
           <property name="defaultDropAction">
            <enum>Qt::IgnoreAction</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="indentation">
+           <number>20</number>
+          </property>
+          <property name="uniformRowHeights">
+           <bool>true</bool>
           </property>
           <column>
            <property name="text">

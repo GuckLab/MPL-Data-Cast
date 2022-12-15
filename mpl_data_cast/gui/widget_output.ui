@@ -84,8 +84,20 @@
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::NoDragDrop</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="indentation">
+           <number>20</number>
+          </property>
           <property name="uniformRowHeights">
            <bool>true</bool>
+          </property>
+          <property name="animated">
+           <bool>false</bool>
           </property>
           <property name="topLevelItemCount" stdset="0">
            <number>0</number>
