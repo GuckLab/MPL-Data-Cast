@@ -17,7 +17,7 @@ def main(splash=True):
         splash.setMask(splash_pix.mask())
         splash.show()
 
-    from PyQt6 import QtCore, QtGui
+    from PyQt6 import QtGui
     from mpl_data_cast.gui import MPLDataCast
 
     # Set Application Icon

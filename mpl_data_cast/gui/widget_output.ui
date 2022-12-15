@@ -80,16 +80,21 @@
          </layout>
         </item>
         <item>
-         <widget class="QTreeView" name="treeView_output">
+         <widget class="QTreeWidget" name="treeWidget_output">
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
           <property name="uniformRowHeights">
            <bool>true</bool>
           </property>
-          <attribute name="headerCascadingSectionResizes">
-           <bool>true</bool>
-          </attribute>
+          <property name="topLevelItemCount" stdset="0">
+           <number>0</number>
+          </property>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
          </widget>
         </item>
        </layout>

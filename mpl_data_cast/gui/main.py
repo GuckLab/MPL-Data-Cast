@@ -1,6 +1,7 @@
 import os
 import time
 import sys
+import traceback
 import pathlib
 import dclab
 import h5py
@@ -38,9 +39,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.path_target = None
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
-        # todo connect the lineEdit editingFinished() signal to the function to
-        #  update the text displayed in the lineEdit element
-        # self.lineEdit_input.textEdited.connect(self.update_input_dir())
         # GUI
         self.setWindowTitle(f"MPL-Data-Cast {__version__}")
         # Disable native menu bar (e.g. on Mac)
@@ -89,7 +87,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         QtWidgets.QMessageBox.information(self, "Software", sw_text)
 
-    # @show_wait_cursor
     @QtCore.pyqtSlot()
     def on_task_transfer(self):
         if not self.widget_input.path.exists():
@@ -113,6 +110,9 @@ class MPLDataCast(QtWidgets.QMainWindow):
         if result["success"]:
             QtWidgets.QMessageBox.information(self, "Transfer completed",
                                               "Data transfer completed.")
+            self.progressBar.setValue(0)
+            QtWidgets.QApplication.processEvents(
+                QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
         else:
             msg = "Some problems occured during data transfer:\n"
             for path, _ in result["errors"]:
@@ -154,3 +154,48 @@ class Callback:
             return self.size / 1024 ** 2 / (curtime - self.time_start)
         else:
             return 0
+
+
+def excepthook(etype, value, trace):
+    """
+    Handler for all unhandled exceptions.
+
+    :param `etype`: the exception type (`SyntaxError`,
+        `ZeroDivisionError`, etc...);
+    :type `etype`: `Exception`
+    :param string `value`: the exception error message;
+    :param string `trace`: the traceback header, if any (otherwise, it
+        prints the standard Python header: ``Traceback (most recent
+        call last)``.
+    """
+    vinfo = f"Unhandled exception in MPL-Data-Cast version {__version__}:\n"
+    tmp = traceback.format_exception(etype, value, trace)
+    exception = "".join([vinfo]+tmp)
+
+    errorbox = QtWidgets.QMessageBox()
+    errorbox.addButton(QtWidgets.QPushButton('Close'),
+                       QtWidgets.QMessageBox.ButtonRole.YesRole)
+    errorbox.addButton(QtWidgets.QPushButton(
+        'Copy text && Close'), QtWidgets.QMessageBox.ButtonRole.NoRole)
+    errorbox.setText(exception)
+    ret = errorbox.exec()
+    if ret == 1:
+        cb = QtWidgets.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard)
+        cb.setText(exception)
+
+
+def error(message, info=None, details=None):
+    """Shows a little window for error messages."""
+    msg = QtWidgets.QMessageBox()
+    msg.setIcon(QtWidgets.QMessageBox.Critical)
+    msg.setWindowTitle("Errors occured")
+    msg.setText(message)
+    if info:
+        msg.setInformativeText(info)
+    if details:
+        msg.setDetailedText(details)
+    msg.exec()
+
+# Display exception hook in separate dialog instead of crashing
+sys.excepthook = excepthook

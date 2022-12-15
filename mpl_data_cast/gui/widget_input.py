@@ -8,6 +8,8 @@ class InputPathError(BaseException):
 
 
 class InputWidget(QtWidgets.QWidget):
+    """Widget in the RTDC tab view dealing with the input directory.
+    Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
         self.path = None
         super(InputWidget, self).__init__(*args, **kwargs)
@@ -18,6 +20,8 @@ class InputWidget(QtWidgets.QWidget):
         uic.loadUi(path_ui, self)
         self.pushButton_input_dir.clicked.connect(
             self.on_task_select_input_dir)
+        self.lineEdit_input.editingFinished.connect(
+            self.update_input_dir_from_lineedit)
 
     @QtCore.pyqtSlot()
     def on_task_select_input_dir(self):
@@ -45,11 +49,27 @@ class InputWidget(QtWidgets.QWidget):
 
         self.update_input_dir(path_input)
 
+    def update_input_dir_from_lineedit(self):
+        """Executed when the input path was manually edited by the user."""
+        output_dir = self.lineEdit_input.text()
+        if output_dir:
+            self.update_input_dir(output_dir)
+
     def update_input_dir(self, input_dir):
+        """Checks if the input directory as given by the user exists and
+        updates the lineEdit widget accordingly.
+        Raises InputPathError if the directory does not exist.
+
+        Parameter
+        ---------
+        input_dir: str or pathlib.Path
+            The directory for the input.
+        """
         input_dir = pathlib.Path(input_dir)
         if input_dir.exists():
             self.path = input_dir
             self.lineEdit_input.setText(str(input_dir))
             # todo update treeview
         else:
-            raise InputPathError("The input directory is not valid.")
+            raise InputPathError("The input directory is not valid, it "
+                                 "does not seem to exist.")

@@ -8,6 +8,8 @@ class OutputPathError(BaseException):
 
 
 class OutputWidget(QtWidgets.QWidget):
+    """Widget in the RTDC tab view dealing with the output directory.
+    Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
         self.path = None
         super(OutputWidget, self).__init__(*args, **kwargs)
@@ -18,6 +20,8 @@ class OutputWidget(QtWidgets.QWidget):
         uic.loadUi(path_ui, self)
         self.pushButton_output_dir.clicked.connect(
             self.on_task_select_output_dir)
+        self.lineEdit_output.editingFinished.connect(
+            self.update_output_dir_from_lineedit)
 
     @QtCore.pyqtSlot()
     def on_task_select_output_dir(self):
@@ -45,11 +49,30 @@ class OutputWidget(QtWidgets.QWidget):
 
         self.update_output_dir(path_output)
 
+    def update_output_dir_from_lineedit(self):
+        """Executed when the output path was manually edited by the user."""
+        output_dir = self.lineEdit_output.text()
+        if output_dir:
+            self.update_output_dir(output_dir)
+
     def update_output_dir(self, output_dir):
+        """Checks if the output directory as given by the user exists and
+        updates the lineEdit widget accordingly.
+        Raises OutputPathError if the directory does not exist.
+
+        Parameter
+        ---------
+        output_dir: str or pathlib.Path
+            The directory for the output.
+        """
         output_dir = pathlib.Path(output_dir)
         if output_dir.exists():
             self.path = output_dir
             self.lineEdit_output.setText(str(output_dir))
-            # todo update treeview
+            self.update_tree_view()
         else:
-            raise OutputPathError("The output directory is not valid.")
+            raise OutputPathError("The output directory is not valid, it "
+                                  "does not seem to exist.")
+
+    def update_tree_view(self):
+        root_dir = self.path
