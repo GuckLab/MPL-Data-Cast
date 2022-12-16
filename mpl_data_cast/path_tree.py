@@ -21,7 +21,8 @@ class PathTree:
             The root of the path tree. Must be absolute path.
         """
         if not isinstance(path, pathlib.Path):
-            raise TypeError("Path for PathTree is not")
+            raise TypeError(f"Path for PathTree must be `pathlib.Path`. Got "
+                            f"{type(path)} instead!")
         if path.is_dir():
             self.tree_root = path
         elif path.is_file():
@@ -36,7 +37,6 @@ class PathTree:
         self.tree_depth = self.get_tree_depth()
 
     def __contains__(self, other_path: pathlib.Path) -> bool | pathlib.Path:
-        """"""
         # might need an if here.
         if other_path.parts[0] in self.children:
             return other_path.relative_to(self.tree_root)
@@ -61,6 +61,11 @@ class PathTree:
 def list_items_in_tree(p_tree: PathTree,
                        tree_widget: QtWidgets.QTreeWidget,
                        h_level: int = 0) -> None:
+    """Recursive function used for visualisation of the paths saved in a
+    `PathTree` object.
+    To avoid problems when working with many nested subdirectories, a limit
+    for the maximum depth of subfolders is given by the parameter `h_level`.
+    """
     root_item = QtWidgets.QTreeWidgetItem(tree_widget)
     root_item.setText(h_level, p_tree.tree_root.name)
     for file in p_tree.get_file_list():

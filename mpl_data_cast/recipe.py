@@ -203,7 +203,7 @@ class Recipe(ABC):
         return success
 
 
-def get_available_recipe_names() -> list:
+def get_available_recipe_names() -> list[str]:
     names = []
     for cls in Recipe.__subclasses__():
         names.append(map_class_to_recipe_name(cls))
@@ -216,7 +216,7 @@ def map_class_to_recipe_name(cls: Type[Recipe]) -> str:
     return cls_name[:-6]
 
 
-def map_recipe_name_to_class(recipe_name):
+def map_recipe_name_to_class(recipe_name: str) -> Type[Recipe]:
     for cls in Recipe.__subclasses__():
         if cls.__name__.lower() == recipe_name.lower() + "recipe":
             return cls

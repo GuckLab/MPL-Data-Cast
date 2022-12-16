@@ -147,6 +147,7 @@ class Callback:
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
 
     def get_rate(self) -> float:
+        """Calculate processing rate in MB/s"""
         curtime = time.monotonic()
         if curtime > self.time_start:
             return self.size / 1024 ** 2 / (curtime - self.time_start)

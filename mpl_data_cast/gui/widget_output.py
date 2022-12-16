@@ -78,6 +78,8 @@ class OutputWidget(QtWidgets.QWidget):
                                   "does not seem to exist.")
 
     def update_tree(self) -> None:
+        """Update the `PathTree` object based on the current root path in
+        `self.path` and update the GUI to show the new tree."""
         self.p_tree = PathTree(self.path)
         self.treeWidget_output.clear()
         self.treeWidget_output.setColumnCount(self.p_tree.tree_depth + 2)
