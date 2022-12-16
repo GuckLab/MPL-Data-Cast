@@ -1,6 +1,6 @@
 import json
 import warnings
-
+import pathlib
 import h5py
 import numpy as np
 import tifffile
@@ -52,7 +52,7 @@ class QLSIRecipe(Recipe):
         ds.attrs.create('IMAGE_VERSION', np.string_('1.2'))
         ds.attrs.create('IMAGE_SUBCLASS', np.string_('IMAGE_GRAYSCALE'))
 
-    def convert_dataset(self, path_list, temp_path,
+    def convert_dataset(self, path_list: list, temp_path: pathlib.Path,
                         wavelength: float = None,
                         pixel_size: float = None,
                         medium_index: float = None,

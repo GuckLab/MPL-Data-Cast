@@ -1,3 +1,4 @@
+import pathlib
 import h5py
 import numpy as np
 
@@ -8,7 +9,7 @@ from ..recipe import Recipe
 class OAHRecipe(Recipe):
     """Matlab file format (TopogMap.mat) for DHM data"""
 
-    def convert_dataset(self, path_list, temp_path,
+    def convert_dataset(self, path_list: list, temp_path: pathlib.Path,
                         wavelength: float = None,
                         pixel_size: float = None,
                         medium_index: float = None,

@@ -27,7 +27,7 @@ class InputWidget(QtWidgets.QWidget):
             self.update_input_dir_from_lineedit)
 
     @QtCore.pyqtSlot()
-    def on_task_select_input_dir(self):
+    def on_task_select_input_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             caption="Select input directory:")
@@ -52,13 +52,13 @@ class InputWidget(QtWidgets.QWidget):
 
         self.update_input_dir(path_input)
 
-    def update_input_dir_from_lineedit(self):
+    def update_input_dir_from_lineedit(self) -> None:
         """Executed when the input path was manually edited by the user."""
         output_dir = self.lineEdit_input.text()
         if output_dir:
             self.update_input_dir(output_dir)
 
-    def update_input_dir(self, input_dir):
+    def update_input_dir(self, input_dir: str | pathlib.Path) -> None:
         """Checks if the input directory as given by the user exists and
         updates the lineEdit widget accordingly.
         Raises InputPathError if the directory does not exist.
@@ -77,7 +77,7 @@ class InputWidget(QtWidgets.QWidget):
             raise InputPathError("The input directory is not valid, it "
                                  "does not seem to exist.")
 
-    def update_tree(self):
+    def update_tree(self) -> None:
         self.p_tree = PathTree(self.path)
         self.treeWidget_input.clear()
         self.treeWidget_input.setColumnCount(self.p_tree.tree_depth + 2)

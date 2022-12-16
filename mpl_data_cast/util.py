@@ -2,9 +2,13 @@
 import functools
 import hashlib
 import pathlib
+from typing import Callable
 
 
-def hashfile(fname, blocksize=65536, count=0, constructor=hashlib.md5):
+def hashfile(fname: str | pathlib.Path,
+             blocksize: int = 65536,
+             count: int = 0,
+             constructor: Callable = hashlib.md5) -> str:
     """Compute md5 hex-hash of a file
 
     Parameters
@@ -31,8 +35,11 @@ def hashfile(fname, blocksize=65536, count=0, constructor=hashlib.md5):
 
 
 @functools.lru_cache(maxsize=100)
-def _hashfile_cached(path, path_stats, blocksize=65536, count=0,
-                     constructor=hashlib.md5):
+def _hashfile_cached(path: pathlib.Path,
+                     path_stats: tuple,
+                     blocksize: int = 65536,
+                     count: int = 0,
+                     constructor: Callable = hashlib.md5) -> str:
     """Cached hashfile using stat tuple as cache
 
     This is a privat function. Please use `hashfile` instead!

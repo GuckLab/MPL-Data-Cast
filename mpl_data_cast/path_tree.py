@@ -35,7 +35,7 @@ class PathTree:
                 self.children[file_obj.name] = PathTree(file_obj)
         self.tree_depth = self.get_tree_depth()
 
-    def __contains__(self, other_path):
+    def __contains__(self, other_path: pathlib.Path) -> bool | pathlib.Path:
         """"""
         # might need an if here.
         if other_path.parts[0] in self.children:
@@ -43,7 +43,7 @@ class PathTree:
         else:
             return False
 
-    def get_tree_depth(self):
+    def get_tree_depth(self) -> int:
         """return the depth of the path tree. If there are no subfolders,
         the depth is 0. """
         if self.children:
@@ -53,12 +53,14 @@ class PathTree:
         else:
             return 0
 
-    def get_file_list(self):
+    def get_file_list(self) -> list[pathlib.Path]:
         """return a list of all files in the root directory."""
         return [x for x in self.tree_root.glob("*.*") if x.is_file()]
 
 
-def list_items_in_tree(p_tree, tree_widget, h_level=0):
+def list_items_in_tree(p_tree: PathTree,
+                       tree_widget: QtWidgets.QTreeWidget,
+                       h_level: int = 0) -> None:
     root_item = QtWidgets.QTreeWidgetItem(tree_widget)
     root_item.setText(h_level, p_tree.tree_root.name)
     for file in p_tree.get_file_list():

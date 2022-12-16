@@ -27,7 +27,7 @@ class OutputWidget(QtWidgets.QWidget):
             self.update_output_dir_from_lineedit)
 
     @QtCore.pyqtSlot()
-    def on_task_select_output_dir(self):
+    def on_task_select_output_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             caption="Select output directory:")
@@ -52,13 +52,13 @@ class OutputWidget(QtWidgets.QWidget):
 
         self.update_output_dir(path_output)
 
-    def update_output_dir_from_lineedit(self):
+    def update_output_dir_from_lineedit(self) -> None:
         """Executed when the output path was manually edited by the user."""
         output_dir = self.lineEdit_output.text()
         if output_dir:
             self.update_output_dir(output_dir)
 
-    def update_output_dir(self, output_dir):
+    def update_output_dir(self, output_dir: str | pathlib.Path) -> None:
         """Checks if the output directory as given by the user exists and
         updates the lineEdit widget accordingly.
         Raises OutputPathError if the directory does not exist.
@@ -77,7 +77,7 @@ class OutputWidget(QtWidgets.QWidget):
             raise OutputPathError("The output directory is not valid, it "
                                   "does not seem to exist.")
 
-    def update_tree(self):
+    def update_tree(self) -> None:
         self.p_tree = PathTree(self.path)
         self.treeWidget_output.clear()
         self.treeWidget_output.setColumnCount(self.p_tree.tree_depth + 2)

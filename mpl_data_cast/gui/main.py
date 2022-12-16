@@ -19,10 +19,6 @@ QtGui.QIcon.setThemeSearchPaths([
 QtGui.QIcon.setThemeName(".")
 
 
-class TargetPathError(BaseException):
-    pass
-
-
 class MPLDataCast(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         """Initialize MPL-Data-Cast"""
@@ -53,11 +49,12 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.raise_()
 
     @QtCore.pyqtSlot()
-    def on_action_quit(self):
+    def on_action_quit(self) -> None:
         """Determine what happens when the user wants to quit"""
         QtCore.QCoreApplication.quit()
 
-    def on_action_about(self):
+    def on_action_about(self) -> None:
+        """Show imprint."""
         gh = "GuckLab/MPL-Data-Cast"
         rtd = "mpl-data-cast.readthedocs.io"
         about_text = "Convert and transfer data from measurement PCs to " \
@@ -72,7 +69,8 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                     about_text)
 
     @QtCore.pyqtSlot()
-    def on_action_software(self):
+    def on_action_software(self) -> None:
+        """Show used software packages and dependencies."""
         libs = [dclab,
                 h5py,
                 numpy,
@@ -88,20 +86,18 @@ class MPLDataCast(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Software", sw_text)
 
     @QtCore.pyqtSlot()
-    def on_task_transfer(self):
+    def on_task_transfer(self) -> None:
+        """Execute recipe to transfer data."""
         if not self.widget_input.path.exists():
             QtWidgets.QMessageBox.information(self, "Error",
                                               "Input directory not correct!")
-            # raise InputPathError
         if not self.widget_output.path.exists():
             QtWidgets.QMessageBox.information(self, "Error",
                                               "Target directory not correct!")
-            # raise TargetPathError
 
-        # instantiate the class
         rp = RTDCRecipe(self.widget_input.path, self.widget_output.path)
 
-        nb_files = 0
+        nb_files = 0  # counter for files, used for progress bar
         for elem in self.widget_input.path.rglob("*.*"):
             if elem.is_file():
                 nb_files += 1
@@ -119,8 +115,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
             for path, _ in result["errors"]:
                 msg += f" - {path}\n"
 
-            QtWidgets.QMessageBox.information(
-                self, "Error", msg)
+            QtWidgets.QMessageBox.information(self, "Error", msg)
 
             text = ""
             for path, tb in result["errors"]:
@@ -129,7 +124,9 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
 
 class Callback:
-    def __init__(self, gui, max_count):
+    """Makes it possible to execute code everytime a file was processed.
+    Used for updating the progress bar and calculating the processing rate."""
+    def __init__(self, gui, max_count: int):
         self.gui = gui
         self.counter = 0
         self.max_count = max_count
@@ -142,14 +139,14 @@ class Callback:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def __call__(self, path):
+    def __call__(self, path) -> None:
         self.counter += 1
         self.size += path.stat().st_size
         self.gui.progressBar.setValue(int(self.counter/self.max_count * 100))
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
 
-    def get_rate(self):
+    def get_rate(self) -> float:
         curtime = time.monotonic()
         if curtime > self.time_start:
             return self.size / 1024 ** 2 / (curtime - self.time_start)
@@ -157,17 +154,19 @@ class Callback:
             return 0
 
 
-def excepthook(etype, value, trace):
+def excepthook(etype, value, trace) -> None:
     """
     Handler for all unhandled exceptions.
 
-    :param `etype`: the exception type (`SyntaxError`,
-        `ZeroDivisionError`, etc...);
-    :type `etype`: `Exception`
-    :param string `value`: the exception error message;
-    :param string `trace`: the traceback header, if any (otherwise, it
-        prints the standard Python header: ``Traceback (most recent
-        call last)``.
+    Parameters
+    ----------
+    etype : Type[BaseException]
+        the exception type (`SyntaxError`, `ZeroDivisionError`, etc...)
+    value : BaseException | str
+        The exception error message;
+    trace : TracebackType | str
+        the traceback header, if any (otherwise, it prints the standard
+        Python header: ``Traceback (most recent call last)``.
     """
     vinfo = f"Unhandled exception in MPL-Data-Cast version {__version__}:\n"
     tmp = traceback.format_exception(etype, value, trace)
@@ -186,10 +185,10 @@ def excepthook(etype, value, trace):
         cb.setText(exception)
 
 
-def error(message, info=None, details=None):
+def error(message: str, info: str = "", details: str = "") -> None:
     """Shows a little window for error messages."""
     msg = QtWidgets.QMessageBox()
-    msg.setIcon(QtWidgets.QMessageBox.Critical)
+    msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
     msg.setWindowTitle("Errors occured")
     msg.setText(message)
     if info:
