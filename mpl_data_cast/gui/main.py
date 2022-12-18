@@ -36,8 +36,11 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.settings = QtCore.QSettings()
         # self.settings.setIniCodec("utf-8")
 
-        # some variables
-        self.path_output = self.settings.value("rtdc_output_path", "")
+        # load some values from the settings
+        self.widget_output.update_output_dir(
+            self.settings.value("rtdc/output_path", ""))
+        self.widget_output.p_tree.tree_depth = self.settings.value(
+            "rtdc/tree_depth")
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI

@@ -60,6 +60,20 @@ class Preferences(QtWidgets.QDialog):
                 value = int(widget.isChecked())
             elif isinstance(widget, QtWidgets.QLineEdit):
                 value = widget.text().strip()
+                if widget is self.rtdc_output_path:
+                    prev_value = self.settings.value(key)
+                    path = pathlib.Path(widget.text().strip())
+                    if path.exists():
+                        value = str(path)
+                    else:
+                        msg = QtWidgets.QMessageBox()
+                        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+                        msg.setText("Given path does not exist! Please "
+                                    "check!\nPrevious setting will be"
+                                    " restored.")
+                        msg.setWindowTitle("Warning")
+                        msg.exec()
+                        value = prev_value
             elif isinstance(widget, QtWidgets.QSpinBox):
                 value = int(widget.value())
             else:

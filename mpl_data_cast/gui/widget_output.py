@@ -74,8 +74,14 @@ class OutputWidget(QtWidgets.QWidget):
             self.lineEdit_output.setText(str(output_dir))
             self.update_tree()
         else:
-            raise OutputPathError("The output directory is not valid, it "
-                                  "does not seem to exist.")
+            msg_txt = "The input directory is not valid, it does not seem" \
+                      " to exist."
+            # raise OutputPathError(msg_txt)
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            msg.setText(msg_txt)
+            msg.setWindowTitle("Warning")
+            msg.exec()
 
     def update_tree(self) -> None:
         """Update the `PathTree` object based on the current root path in

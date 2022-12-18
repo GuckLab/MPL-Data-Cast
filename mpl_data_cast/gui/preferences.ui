@@ -25,7 +25,7 @@
      </property>
      <widget class="QWidget" name="tab_rtdc">
       <attribute name="title">
-       <string>Advanced</string>
+       <string>RTDC</string>
       </attribute>
       <widget class="QWidget" name="">
        <property name="geometry">
