@@ -1,3 +1,4 @@
+import pathlib
 from PyQt6 import uic, QtCore, QtWidgets
 import pkg_resources
 
@@ -17,7 +18,7 @@ class Preferences(QtWidgets.QDialog):
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
             ["rtdc/output_path", self.rtdc_output_path,
-             "T:\\Data\RTDC - UKER\\Augenklinik"],
+             pathlib.Path.cwd()],
             ["rtdc/tree_depth", self.tree_depth, 10],
         ]
         self.reload()
@@ -45,7 +46,7 @@ class Preferences(QtWidgets.QDialog):
             if isinstance(widget, QtWidgets.QCheckBox):
                 widget.setChecked(bool(int(value)))
             elif isinstance(widget, QtWidgets.QLineEdit):
-                widget.setText(value)
+                widget.setText(str(value))
             elif isinstance(widget, QtWidgets.QSpinBox):
                 widget.setValue(int(value))
             else:
