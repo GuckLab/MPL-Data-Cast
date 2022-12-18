@@ -23,6 +23,7 @@ QtGui.QIcon.setThemeName(".")
 class MPLDataCast(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         """Initialize MPL-Data-Cast"""
+        QtCore.QCoreApplication.setOrganizationName("GuckLab")
         QtCore.QCoreApplication.setApplicationName("MPL-Data-Cast")
         super(MPLDataCast, self).__init__(*args, **kwargs)
 
@@ -39,8 +40,10 @@ class MPLDataCast(QtWidgets.QMainWindow):
         # load some values from the settings
         self.widget_output.update_output_dir(
             self.settings.value("rtdc/output_path", ""))
-        self.widget_output.p_tree.tree_depth = self.settings.value(
-            "rtdc/tree_depth")
+        self.widget_output.tree_depth_limit = int(self.settings.value(
+            "rtdc/tree_depth_limit", 8))
+        self.widget_input.tree_depth_limit = int(self.settings.value(
+            "rtdc/tree_depth_limit", 8))
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI
@@ -79,7 +82,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
                      + "GitHub: " \
                      + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
                      + "Documentation: " \
-                     + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
+                     + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)  # noqa 501
         QtWidgets.QMessageBox.about(self,
                                     "MPL-Data-Cast {}".format(version),
                                     about_text)

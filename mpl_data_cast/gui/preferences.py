@@ -19,7 +19,7 @@ class Preferences(QtWidgets.QDialog):
         self.config_pairs = [
             ["rtdc/output_path", self.rtdc_output_path,
              pathlib.Path.cwd()],
-            ["rtdc/tree_depth", self.tree_depth, 10],
+            ["rtdc/tree_depth_limit", self.tree_depth_limit, 8],
         ]
         self.reload()
 
@@ -29,13 +29,11 @@ class Preferences(QtWidgets.QDialog):
         self.btn_apply.clicked.connect(self.on_settings_apply)
         self.btn_cancel = self.buttonBox.button(
             QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        self.btn_ok = self.buttonBox.button(
-            QtWidgets.QDialogButtonBox.StandardButton.Ok)
-        self.btn_ok.clicked.connect(self.on_settings_apply)
         self.btn_restore = self.buttonBox.button(
             QtWidgets.QDialogButtonBox.StandardButton.RestoreDefaults)
         self.btn_restore.clicked.connect(self.on_settings_restore)
-
+        self.select_rtdc_output_path.clicked.connect(
+            self.on_task_select_output_dir)
         # tab changed
         self.tabWidget.currentChanged.connect(self.on_tab_changed)
 
@@ -80,7 +78,12 @@ class Preferences(QtWidgets.QDialog):
                 raise NotImplementedError("No rule for '{}'".format(key))
             self.settings.setValue(key, value)
 
-        # reload UI to give visual feedback
+        # show dialog and reload UI to give visual feedback
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+        msg.setText("Please restart MPL-Data-Cast to use new settings.")
+        msg.setWindowTitle("Information")
+        msg.exec()
         self.reload()
 
     @QtCore.pyqtSlot()
@@ -94,3 +97,9 @@ class Preferences(QtWidgets.QDialog):
         self.btn_cancel.setEnabled(True)
         self.btn_restore.setEnabled(True)
 
+    @QtCore.pyqtSlot()
+    def on_task_select_output_dir(self) -> None:
+        p = QtWidgets.QFileDialog.getExistingDirectory(
+            self,
+            caption="Select output directory:")
+        self.rtdc_output_path.setText(str(p))

@@ -1,6 +1,7 @@
 from PyQt6 import QtWidgets, QtCore, uic
 import pkg_resources
 import pathlib
+import numpy as np
 
 from ..path_tree import PathTree, list_items_in_tree
 
@@ -15,6 +16,7 @@ class InputWidget(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         self.path = None
         self.p_tree = None
+        self.tree_depth_limit = 3
         super(InputWidget, self).__init__(*args, **kwargs)
 
         QtWidgets.QMainWindow.__init__(self)
@@ -88,7 +90,8 @@ class InputWidget(QtWidgets.QWidget):
         `self.path` and update the GUI to show the new tree."""
         self.p_tree = PathTree(self.path)
         self.treeWidget_input.clear()
-        self.treeWidget_input.setColumnCount(self.p_tree.tree_depth + 2)
+        self.treeWidget_input.setColumnCount(
+            np.min([self.tree_depth_limit, self.p_tree.tree_depth]) + 2)
 
         list_items_in_tree(self.p_tree,
                            self.treeWidget_input,

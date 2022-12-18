@@ -84,11 +84,20 @@
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
           <property name="dragDropMode">
            <enum>QAbstractItemView::NoDragDrop</enum>
           </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="textElideMode">
+           <enum>Qt::ElideNone</enum>
           </property>
           <property name="indentation">
            <number>20</number>
@@ -97,11 +106,14 @@
            <bool>true</bool>
           </property>
           <property name="animated">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="topLevelItemCount" stdset="0">
            <number>0</number>
           </property>
+          <attribute name="headerVisible">
+           <bool>true</bool>
+          </attribute>
           <column>
            <property name="text">
             <string notr="true">1</string>

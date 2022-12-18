@@ -33,6 +33,7 @@ class PathTree:
         self.children = {}
         for file_obj in self.tree_root.iterdir():
             if file_obj.is_dir():
+                # ToDo implement max depth limit. maybe via arg to constructor?
                 self.children[file_obj.name] = PathTree(file_obj)
         self.tree_depth = self.get_tree_depth()
 
