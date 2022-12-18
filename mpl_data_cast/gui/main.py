@@ -9,8 +9,9 @@ import numpy
 import pkg_resources
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
+from .import preferences
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
-from .._version import version as __version__
+from .._version import version as version
 
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
@@ -30,16 +31,21 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                                   "main.ui")
         uic.loadUi(path_ui, self)
 
+        # settings
+        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
+        self.settings = QtCore.QSettings()
+        # self.settings.setIniCodec("utf-8")
+
         # some variables
-        self.path_input = None
-        self.path_target = None
+        self.path_output = self.settings.value("rtdc_output_path", "")
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI
-        self.setWindowTitle(f"MPL-Data-Cast {__version__}")
+        self.setWindowTitle(f"MPL-Data-Cast {version}")
         # Disable native menu bar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
         # File menu
+        self.actionPreferences.triggered.connect(self.on_action_preferences)
         self.actionQuit.triggered.connect(self.on_action_quit)
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
@@ -47,6 +53,13 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         self.show()
         self.raise_()
+
+    @QtCore.pyqtSlot()
+    def on_action_preferences(self):
+        """Show the preferences dialog"""
+        dlg = preferences.Preferences(self)
+        dlg.setWindowTitle("MPL-DataCast Preferences")
+        dlg.exec()
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
@@ -65,7 +78,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
                      + "Documentation: " \
                      + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
         QtWidgets.QMessageBox.about(self,
-                                    "MPL-Data-Cast {}".format(__version__),
+                                    "MPL-Data-Cast {}".format(version),
                                     about_text)
 
     @QtCore.pyqtSlot()
@@ -76,7 +89,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
                 numpy,
                 ]
 
-        sw_text = f"MPL-Data-Cast {__version__}\n\n"
+        sw_text = f"MPL-Data-Cast {version}\n\n"
         sw_text += f"Python {sys.version}\n\n"
         sw_text += "Modules:\n"
         for lib in libs:
@@ -93,7 +106,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                               "Input directory not correct!")
         if not self.widget_output.path.exists():
             QtWidgets.QMessageBox.information(self, "Error",
-                                              "Target directory not correct!")
+                                              "Output directory not correct!")
 
         rp = RTDCRecipe(self.widget_input.path, self.widget_output.path)
 
@@ -169,7 +182,7 @@ def excepthook(etype, value, trace) -> None:
         the traceback header, if any (otherwise, it prints the standard
         Python header: ``Traceback (most recent call last)``.
     """
-    vinfo = f"Unhandled exception in MPL-Data-Cast version {__version__}:\n"
+    vinfo = f"Unhandled exception in MPL-Data-Cast version {version}:\n"
     tmp = traceback.format_exception(etype, value, trace)
     exception = "".join([vinfo]+tmp)
 
