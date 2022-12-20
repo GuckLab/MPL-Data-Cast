@@ -102,6 +102,9 @@
           <property name="uniformRowHeights">
            <bool>true</bool>
           </property>
+          <property name="columnCount">
+           <number>1</number>
+          </property>
           <attribute name="headerVisible">
            <bool>true</bool>
           </attribute>

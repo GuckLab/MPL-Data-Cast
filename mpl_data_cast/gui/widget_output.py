@@ -88,14 +88,15 @@ class OutputWidget(QtWidgets.QWidget):
     def update_tree(self) -> None:
         """Update the `PathTree` object based on the current root path in
         `self.path` and update the GUI to show the new tree."""
-        self.p_tree = PathTree(self.path)
+        self.p_tree = PathTree(self.path, self.tree_depth_limit)
         self.treeWidget_output.clear()
         self.treeWidget_output.setColumnCount(
-            np.min([self.tree_depth_limit, self.p_tree.tree_depth]) + 2)
+            np.min([self.tree_depth_limit, self.p_tree.tree_depth]) + 1)
 
         list_items_in_tree(self.p_tree,
                            self.treeWidget_output,
-                           h_level=0)
+                           h_level=0,
+                           depth_limit=self.tree_depth_limit)
 
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)

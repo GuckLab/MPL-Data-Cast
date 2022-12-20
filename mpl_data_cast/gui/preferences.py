@@ -78,12 +78,7 @@ class Preferences(QtWidgets.QDialog):
                 raise NotImplementedError("No rule for '{}'".format(key))
             self.settings.setValue(key, value)
 
-        # show dialog and reload UI to give visual feedback
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-        msg.setText("Please restart MPL-Data-Cast to use new settings.")
-        msg.setWindowTitle("Information")
-        msg.exec()
+        # reload UI to give visual feedback
         self.reload()
 
     @QtCore.pyqtSlot()

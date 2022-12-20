@@ -38,12 +38,12 @@ class MPLDataCast(QtWidgets.QMainWindow):
         # self.settings.setIniCodec("utf-8")
 
         # load some values from the settings
-        self.widget_output.update_output_dir(
-            self.settings.value("rtdc/output_path", ""))
         self.widget_output.tree_depth_limit = int(self.settings.value(
             "rtdc/tree_depth_limit", 8))
         self.widget_input.tree_depth_limit = int(self.settings.value(
             "rtdc/tree_depth_limit", 8))
+        self.widget_output.update_output_dir(
+            self.settings.value("rtdc/output_path", ""))
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI
@@ -66,6 +66,15 @@ class MPLDataCast(QtWidgets.QMainWindow):
         dlg = preferences.Preferences(self)
         dlg.setWindowTitle("MPL-DataCast Preferences")
         dlg.exec()
+        # update maximum tree depth
+        self.widget_output.tree_depth_limit = int(self.settings.value(
+            "rtdc/tree_depth_limit", 8))
+        self.widget_input.tree_depth_limit = int(self.settings.value(
+            "rtdc/tree_depth_limit", 8))
+        if self.widget_output.path is not None:
+            self.widget_output.update_output_dir(self.widget_output.path)
+        if self.widget_input.path is not None:
+            self.widget_input.update_input_dir(self.widget_input.path)
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
