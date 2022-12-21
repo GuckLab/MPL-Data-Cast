@@ -5,13 +5,14 @@ from unittest import mock
 import mpl_data_cast
 from mpl_data_cast.gui.main import MPLDataCast
 from mpl_data_cast.gui.widget_output import OutputWidget
+from mpl_data_cast.gui.widget_input import InputWidget
 
 
 def test_simple(qtbot):
     """Open the main window and close it again, check that some basic
     attributes exist."""
     mw = MPLDataCast()
-    assert isinstance(mw.settings.value("rtdc/tree_depth_limit"), str)
+    assert isinstance(mw.widget_input, InputWidget)
     assert isinstance(mw.widget_output, OutputWidget)
     assert isinstance(mw.pushButton_transfer, QtWidgets.QPushButton)
     mw.close()

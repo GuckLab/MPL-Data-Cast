@@ -11,7 +11,7 @@ from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
 from . import preferences
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
-from .._version import version as version
+from .._version import version
 
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
@@ -65,7 +65,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         """Show the preferences dialog"""
         prev_tree_depth_limit = self.settings.value("rtdc/tree_depth_limit", 8)
         dlg = preferences.Preferences(self)
-        dlg.setWindowTitle("MPL-DataCast Preferences")
+        dlg.setWindowTitle("MPL-Data-Cast Preferences")
         dlg.exec()
         # update maximum tree depth if necessary
         if self.settings.value("rtdc/tree_depth_limit",
