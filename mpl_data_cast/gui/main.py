@@ -9,7 +9,7 @@ import numpy
 import pkg_resources
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
-from .import preferences
+from . import preferences
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
 from .._version import version as version
 
@@ -63,18 +63,21 @@ class MPLDataCast(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def on_action_preferences(self):
         """Show the preferences dialog"""
+        prev_tree_depth_limit = self.settings.value("rtdc/tree_depth_limit", 8)
         dlg = preferences.Preferences(self)
         dlg.setWindowTitle("MPL-DataCast Preferences")
         dlg.exec()
-        # update maximum tree depth
-        self.widget_output.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 8))
-        self.widget_input.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 8))
-        if self.widget_output.path is not None:
-            self.widget_output.update_output_dir(self.widget_output.path)
-        if self.widget_input.path is not None:
-            self.widget_input.update_input_dir(self.widget_input.path)
+        # update maximum tree depth if necessary
+        if self.settings.value("rtdc/tree_depth_limit",
+                               8) != prev_tree_depth_limit:
+            self.widget_output.tree_depth_limit = int(self.settings.value(
+                "rtdc/tree_depth_limit", 8))
+            self.widget_input.tree_depth_limit = int(self.settings.value(
+                "rtdc/tree_depth_limit", 8))
+            if self.widget_output.path is not None:
+                self.widget_output.update_output_dir(self.widget_output.path)
+            if self.widget_input.path is not None:
+                self.widget_input.update_input_dir(self.widget_input.path)
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
@@ -154,6 +157,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
 class Callback:
     """Makes it possible to execute code everytime a file was processed.
     Used for updating the progress bar and calculating the processing rate."""
+
     def __init__(self, gui, max_count: int):
         self.gui = gui
         self.counter = 0
@@ -170,7 +174,7 @@ class Callback:
     def __call__(self, path) -> None:
         self.counter += 1
         self.size += path.stat().st_size
-        self.gui.progressBar.setValue(int(self.counter/self.max_count * 100))
+        self.gui.progressBar.setValue(int(self.counter / self.max_count * 100))
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
 
@@ -199,7 +203,7 @@ def excepthook(etype, value, trace) -> None:
     """
     vinfo = f"Unhandled exception in MPL-Data-Cast version {version}:\n"
     tmp = traceback.format_exception(etype, value, trace)
-    exception = "".join([vinfo]+tmp)
+    exception = "".join([vinfo] + tmp)
 
     errorbox = QtWidgets.QMessageBox()
     errorbox.addButton(QtWidgets.QPushButton('Close'),

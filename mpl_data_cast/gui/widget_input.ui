@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>514</width>
-    <height>511</height>
+    <height>516</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -137,6 +137,9 @@
           </attribute>
           <attribute name="headerCascadingSectionResizes">
            <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>125</number>
           </attribute>
           <column>
            <property name="text">

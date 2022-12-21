@@ -15,6 +15,7 @@ class PathTree:
     def __init__(self, path: pathlib.Path, depth_limit: int = 8):
         """
         Class for handling paths in a tree structure.
+
         Parameters
         ----------
         path : str or pathlib.Path
@@ -34,19 +35,44 @@ class PathTree:
             self.tree_root = path.parent
         else:
             raise PathError("Root path given as input for PathTree is neither "
-                            "a directory nor a file. Don't know what to do.")
+                            "a valid directory nor a valid file. Don't know "
+                            "what to do.")
         self.depth_limit = depth_limit
         self.children = {}
+
         for file_obj in self.tree_root.iterdir():
-            if file_obj.is_dir() and self.depth_limit >= 1:
+            if file_obj.is_dir() and self.depth_limit > 1:
                 self.children[file_obj.name] = PathTree(file_obj,
                                                         self.depth_limit - 1)
+        self.list_child_dirs = []
+        if self.depth_limit == 1:
+            # in case we are in the "deepest" PathTree, only make a list of
+            # subdirectories, but not full PathTree objects. This will make
+            # sure that the function `get_tree_depth` will always return
+            # correct values
+            for file_obj in self.tree_root.iterdir():
+                if file_obj.is_dir():
+                    self.list_child_dirs.append(file_obj.name)
         self.tree_depth = self.get_tree_depth()
 
-    def __contains__(self, other_path: pathlib.Path) -> bool | pathlib.Path:
-        # might need an if here.
-        if other_path.parts[0] in self.children:
-            return other_path.relative_to(self.tree_root)
+    def __contains__(self, other_path: pathlib.Path) -> bool:
+        # this will not work perfectly, since the tree might just not have
+        # enough depth to contain the path in question (if self.depth_limit is
+        # rather small).
+        # To check the whole tree, use:
+        # path in tree.retrieve_full_path_tree()
+        if other_path.samefile(self.tree_root):
+            return True
+        elif self.children:
+            for child_tree in self.children.values():
+                return other_path in child_tree
+        elif self.list_child_dirs:
+            contained = False
+            for sub_dir in self.list_child_dirs:
+                if other_path.samefile(self.tree_root / sub_dir):
+                    contained = True
+                    break
+            return contained
         else:
             return False
 
@@ -80,6 +106,7 @@ def list_items_in_tree(p_tree: PathTree,
     To avoid problems when working with many nested subdirectories, a limit
     for the maximum depth of subfolders is given by the parameter
     `depth_limit`.
+
     Parameters
     ----------
     p_tree : PathTree
@@ -101,7 +128,11 @@ def list_items_in_tree(p_tree: PathTree,
         for file in p_tree.get_file_list():
             item = QtWidgets.QTreeWidgetItem(tree_widget)
             item.setText(h_level + 1, file.name)
-    if p_tree.children and h_level <= depth_limit:
+    if p_tree.children and h_level < depth_limit:
         for child_tree in p_tree.children.values():
             list_items_in_tree(child_tree, tree_widget, h_level + 1,
                                depth_limit)
+    if p_tree.list_child_dirs and h_level <= depth_limit:
+        for sub_dir in p_tree.list_child_dirs:
+            item = QtWidgets.QTreeWidgetItem(tree_widget)
+            item.setText(h_level + 1, sub_dir)
