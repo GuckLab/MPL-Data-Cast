@@ -5,10 +5,6 @@ import pathlib
 from ..path_tree import PathTree, list_items_in_tree
 
 
-class InputPathError(BaseException):
-    pass
-
-
 class InputWidget(QtWidgets.QWidget):
     """Widget in the RTDC tab view dealing with the input directory.
     Contains a lineEdit, a button, and a treeview widget."""
@@ -62,7 +58,6 @@ class InputWidget(QtWidgets.QWidget):
     def update_input_dir(self, input_dir: str | pathlib.Path) -> None:
         """Checks if the input directory as given by the user exists and
         updates the lineEdit widget accordingly.
-        Raises InputPathError if the directory does not exist.
 
         Parameter
         ---------
@@ -77,7 +72,6 @@ class InputWidget(QtWidgets.QWidget):
         else:
             msg_txt = "The input directory is not valid, it does not seem" \
                       " to exist."
-            # raise InputPathError(msg)
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.setText(msg_txt)

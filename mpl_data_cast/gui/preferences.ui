@@ -79,7 +79,7 @@
           <item row="2" column="1" colspan="2">
            <widget class="QSpinBox" name="tree_depth_limit">
             <property name="minimum">
-             <number>2</number>
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>24</number>

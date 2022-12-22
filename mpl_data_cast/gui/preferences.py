@@ -19,7 +19,7 @@ class Preferences(QtWidgets.QDialog):
         self.config_pairs = [
             ["rtdc/output_path", self.rtdc_output_path,
              pathlib.Path.cwd()],
-            ["rtdc/tree_depth_limit", self.tree_depth_limit, 8],
+            ["rtdc/tree_depth_limit", self.tree_depth_limit, 3],
         ]
         self.reload()
 
@@ -71,7 +71,17 @@ class Preferences(QtWidgets.QDialog):
                                     " restored.")
                         msg.setWindowTitle("Warning")
                         msg.exec()
-                        value = prev_value
+                        if pathlib.Path(prev_value).exists():
+                            value = prev_value
+                        else:
+                            msg = QtWidgets.QMessageBox()
+                            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+                            msg.setText("Path from previous settings does not "
+                                        "exist either, original default output"
+                                        " path is restored.")
+                            msg.setWindowTitle("Warning")
+                            msg.exec()
+                            value = pathlib.Path.cwd()
             elif isinstance(widget, QtWidgets.QSpinBox):
                 value = int(widget.value())
             else:

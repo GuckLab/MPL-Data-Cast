@@ -5,10 +5,6 @@ import pathlib
 from ..path_tree import PathTree, list_items_in_tree
 
 
-class OutputPathError(BaseException):
-    pass
-
-
 class OutputWidget(QtWidgets.QWidget):
     """Widget in the RTDC tab view dealing with the output directory.
     Contains a lineEdit, a button, and a treeview widget."""
@@ -62,7 +58,6 @@ class OutputWidget(QtWidgets.QWidget):
     def update_output_dir(self, output_dir: str | pathlib.Path) -> None:
         """Checks if the output directory as given by the user exists and
         updates the lineEdit widget accordingly.
-        Raises OutputPathError if the directory does not exist.
 
         Parameter
         ---------
@@ -75,9 +70,8 @@ class OutputWidget(QtWidgets.QWidget):
             self.lineEdit_output.setText(str(output_dir))
             self.update_tree()
         else:
-            msg_txt = "The input directory is not valid, it does not seem" \
+            msg_txt = "The output directory is not valid, it does not seem" \
                       " to exist."
-            # raise OutputPathError(msg_txt)
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.setText(msg_txt)

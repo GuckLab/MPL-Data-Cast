@@ -18,6 +18,11 @@ is currently under development. An initial GUI to use MPL-Data-Cast for
 transfering RT-DC data is already available. If you encounter bugs or have
 suggestions for improvement, open an issue on
 `GitHub <https://github.com/GuckLab/MPL-Data-Cast/issues>`_.
+To start the GUI, run
+
+```
+python -m mpl_data_cast
+```
 
 
 Motivation
@@ -75,10 +80,10 @@ See also:
 Good to know
 ------------
 
-- MPL-Data-Cast does not create a folder with the same name as the input
-directory in the output directory, it copies the content of the input directory
-into the output directory. That means that you have to be careful when entering
-the output path, or otherwise you might end up mixing up data.
+- MPL-Data-Cast does not create a directory with the same name as the input
+  directory in the output directory, it copies the content of the input
+  directory into the output directory. That means that you have to be careful when
+  entering the output path, or otherwise you might end up mixing up data.
 
-- Right now it is not possible to copy only selected datasets/files from a given
-directory, you can only copy and transfer complete directories.
+- Right now, it is not possible to copy only selected files or subfolders from
+  a given directory, you can only transfer complete directories.

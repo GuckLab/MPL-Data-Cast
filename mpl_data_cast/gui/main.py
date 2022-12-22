@@ -39,11 +39,11 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         # load some values from the settings
         self.widget_output.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 8))
+            "rtdc/tree_depth_limit", 3))
         self.widget_input.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 8))
+            "rtdc/tree_depth_limit", 3))
         self.widget_output.update_output_dir(
-            self.settings.value("rtdc/output_path", ""))
+            self.settings.value("rtdc/output_path", str(pathlib.Path.cwd())))
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI
