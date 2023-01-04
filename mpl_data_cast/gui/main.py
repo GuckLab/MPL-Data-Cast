@@ -10,6 +10,7 @@ import pkg_resources
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
 from . import preferences
+from ..recipe import IGNORED_FILE_NAMES
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
 from .._version import version
 
@@ -88,8 +89,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         """Show imprint."""
         gh = "GuckLab/MPL-Data-Cast"
         rtd = "mpl-data-cast.readthedocs.io"
-        about_text = "Convert and transfer data from measurement PCs to " \
-                     "network shares at MPL.<br><br>" \
+        about_text = "Convert and transfer data.<br><br>" \
                      + "Author: Paul Müller and others<br>" \
                      + "GitHub: " \
                      + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
@@ -130,7 +130,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         nb_files = 0  # counter for files, used for progress bar
         for elem in self.widget_input.path.rglob("*.*"):
-            if elem.is_file():
+            if elem.is_file() and elem.name not in IGNORED_FILE_NAMES:
                 nb_files += 1
         with Callback(self, nb_files) as path_callback:
             result = rp.cast(path_callback=path_callback)

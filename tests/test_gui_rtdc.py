@@ -18,17 +18,21 @@ def test_setting_paths(qtbot, tmp_path):
     mpldc.widget_output.lineEdit_output.setText(str(path_out))
 
 
-def test_transfer_data_simple(qtbot, monkeypatch):
+def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
     """Check that data is transfered when clicking on the button 'Transfer'."""
     mpldc = MPLDataCast()
     qtbot.add_widget(mpldc)
-    path_in = data_path / "example_dir"
+
+    data = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
+    test_file = data / "M001_data.rtdc"
+    test_file_dst = tmp_path / "M001_data.rtdc"
+    shutil.copy(test_file, test_file_dst)
     tmp_dir = tf.TemporaryDirectory()
     path_out = pathlib.Path(tmp_dir.name)
-    assert path_in.exists()
+    assert tmp_path.exists()
     assert path_out.exists()
 
-    mpldc.widget_input.update_input_dir(path_in)
+    mpldc.widget_input.update_input_dir(tmp_path)
     mpldc.widget_output.update_output_dir(path_out)
 
     bt = mpldc.pushButton_transfer
@@ -39,7 +43,7 @@ def test_transfer_data_simple(qtbot, monkeypatch):
                         lambda *args: QtWidgets.QMessageBox.StandardButton.Ok)
     qtbot.mouseClick(bt, QtCore.Qt.MouseButton.LeftButton)
 
-    assert (path_out / "calibration_beads_47.rtdc").exists()
+    assert (path_out / "M001_data.rtdc").exists()
     tmp_dir.cleanup()
 
 
@@ -49,7 +53,9 @@ def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
     mpldc = MPLDataCast()
     mpldc.settings.clear()
     qtbot.add_widget(mpldc)
-    test_file = data_path / "example_dir" / "calibration_beads_47.rtdc"
+
+    data = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
+    test_file = data / "M001_data.rtdc"
     path_in = tf.mkdtemp(prefix="input", dir=tmp_path)
     path_in = pathlib.Path(path_in)
     path_out = tf.mkdtemp(prefix="output", dir=tmp_path)

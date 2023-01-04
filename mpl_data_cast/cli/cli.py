@@ -4,7 +4,7 @@ import time
 
 import click
 
-from . import recipe as mpldc_recipe
+from mpl_data_cast import recipe as mpldc_recipe
 
 
 @click.group()
