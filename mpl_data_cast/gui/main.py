@@ -24,7 +24,7 @@ QtGui.QIcon.setThemeName(".")
 class MPLDataCast(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         """Initialize MPL-Data-Cast"""
-        QtCore.QCoreApplication.setOrganizationName("GuckLab")
+        QtCore.QCoreApplication.setOrganizationName("MPL")
         QtCore.QCoreApplication.setApplicationName("MPL-Data-Cast")
         super(MPLDataCast, self).__init__(*args, **kwargs)
 
@@ -129,7 +129,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         rp = RTDCRecipe(self.widget_input.path, self.widget_output.path)
 
         nb_files = 0  # counter for files, used for progress bar
-        for elem in self.widget_input.path.rglob("*.*"):
+        for elem in self.widget_input.path.rglob("*"):
             if elem.is_file() and elem.name not in IGNORED_FILE_NAMES:
                 nb_files += 1
         with Callback(self, nb_files) as path_callback:
