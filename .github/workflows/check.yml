@@ -44,7 +44,7 @@ jobs:
       if: runner.os != 'macOS'
       run: |
         coverage run --source=mpl_data_cast -m pytest -x tests
-    - name: Test with pytest without GUI tests(macOS)
+    - name: Test with pytest without GUI tests (macOS)
       if: runner.os == 'macOS'
       run: |
         coverage run --source=mpl_data_cast -m pytest -x -k "not gui" tests
