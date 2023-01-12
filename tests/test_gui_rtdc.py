@@ -13,9 +13,13 @@ def test_setting_paths(qtbot, tmp_path):
     """Check that setting the input and output paths works."""
     mpldc = MPLDataCast()
     path_in = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
-    path_out = tmp_path
     mpldc.widget_input.lineEdit_input.setText(str(path_in))
-    mpldc.widget_output.lineEdit_output.setText(str(path_out))
+    mpldc.widget_output.lineEdit_output.setText(str(tmp_path))
+    mpldc.widget_input.update_input_dir_from_lineedit()
+    mpldc.widget_output.update_output_dir_from_lineedit()
+    assert str(mpldc.widget_output.path) == str(tmp_path)
+    assert mpldc.widget_input.p_tree.tree_depth == 1
+    assert mpldc.widget_output.p_tree.tree_depth == 1
 
 
 def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
