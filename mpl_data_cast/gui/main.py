@@ -28,7 +28,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
         QtCore.QCoreApplication.setApplicationName("MPL-Data-Cast")
         super(MPLDataCast, self).__init__(*args, **kwargs)
 
-        QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
                                                   "main.ui")
         uic.loadUi(path_ui, self)
