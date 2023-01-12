@@ -36,7 +36,7 @@ setup(
     python_requires='>=3.9, <4',
     entry_points={
         "gui_scripts": ['mpldc-gui = mpl_data_cast.gui.__main__:main'],
-        "console_scripts": ["mpldc = mpl_data_cast.cli:cli"]},
+        "console_scripts": ["mpldc = mpl_data_cast.cli.cli:cli"]},
     keywords=["Data maintenance", "MPL", "Max Planck"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
