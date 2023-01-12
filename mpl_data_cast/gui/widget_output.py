@@ -9,15 +9,16 @@ class OutputWidget(QtWidgets.QWidget):
     """Widget in the RTDC tab view dealing with the output directory.
     Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
-        self.path = None
-        self.p_tree = None
-        self.tree_depth_limit = 3
         super(OutputWidget, self).__init__(*args, **kwargs)
 
-        QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
                                                   "widget_output.ui")
         uic.loadUi(path_ui, self)
+
+        self.path = None
+        self.p_tree = None
+        self.tree_depth_limit = 3
+
         self.pushButton_output_dir.clicked.connect(
             self.on_task_select_output_dir)
         self.lineEdit_output.editingFinished.connect(
@@ -49,6 +50,7 @@ class OutputWidget(QtWidgets.QWidget):
 
         self.update_output_dir(path_output)
 
+    @QtCore.pyqtSlot()
     def update_output_dir_from_lineedit(self) -> None:
         """Executed when the output path was manually edited by the user."""
         output_dir = self.lineEdit_output.text()
@@ -72,7 +74,7 @@ class OutputWidget(QtWidgets.QWidget):
         else:
             msg_txt = "The output directory is not valid, it does not seem" \
                       " to exist."
-            msg = QtWidgets.QMessageBox()
+            msg = QtWidgets.QMessageBox(self)
             msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.setText(msg_txt)
             msg.setWindowTitle("Warning")

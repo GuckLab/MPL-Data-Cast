@@ -9,15 +9,16 @@ class InputWidget(QtWidgets.QWidget):
     """Widget in the RTDC tab view dealing with the input directory.
     Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
-        self.path = None
-        self.p_tree = None
-        self.tree_depth_limit = 3
         super(InputWidget, self).__init__(*args, **kwargs)
 
-        QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
                                                   "widget_input.ui")
         uic.loadUi(path_ui, self)
+
+        self.path = None
+        self.p_tree = None
+        self.tree_depth_limit = 3
+
         self.pushButton_input_dir.clicked.connect(
             self.on_task_select_input_dir)
         self.lineEdit_input.editingFinished.connect(
@@ -49,6 +50,7 @@ class InputWidget(QtWidgets.QWidget):
 
         self.update_input_dir(path_input)
 
+    @QtCore.pyqtSlot()
     def update_input_dir_from_lineedit(self) -> None:
         """Executed when the input path was manually edited by the user."""
         output_dir = self.lineEdit_input.text()
@@ -72,7 +74,7 @@ class InputWidget(QtWidgets.QWidget):
         else:
             msg_txt = "The input directory is not valid, it does not seem" \
                       " to exist."
-            msg = QtWidgets.QMessageBox()
+            msg = QtWidgets.QMessageBox(self)
             msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.setText(msg_txt)
             msg.setWindowTitle("Warning")
