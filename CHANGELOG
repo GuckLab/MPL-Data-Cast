@@ -1,3 +1,5 @@
+0.4.1
+ - build: bump required Python version to 3.10 (#18)
 0.4.0
  - feat: add first GUI that supports transfer of RTDC data (#3)
  - enh: use type hints everywhere (#9)

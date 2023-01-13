@@ -33,7 +33,7 @@ setup(
         "pyqt6",
         "tifffile==2022.3.16",
     ],
-    python_requires='>=3.9, <4',
+    python_requires='>=3.10, <4',
     entry_points={
         "gui_scripts": ['mpldc-gui = mpl_data_cast.gui.__main__:main'],
         "console_scripts": ["mpldc = mpl_data_cast.cli.cli:cli"]},
