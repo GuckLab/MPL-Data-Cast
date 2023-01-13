@@ -4,7 +4,7 @@ import time
 
 import click
 
-from . import recipe as mpldc_recipe
+from .. import recipe as mpldc_recipe
 
 
 @click.group()
@@ -100,12 +100,12 @@ class CLICallback:
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         rate = self.get_rate()
         self.print(f"Processed {self.counter} files (~{rate:.1f} MB/s).")
         print("")
 
-    def __call__(self, path):
+    def __call__(self, path: pathlib.Path) -> None:
         self.counter += 1
         name = click.format_filename(path, shorten=True)
         message = f"Processing file {self.counter}: {name}"
@@ -115,14 +115,14 @@ class CLICallback:
         self.size += path.stat().st_size
         self.print(message)
 
-    def get_rate(self):
+    def get_rate(self) -> float:
         curtime = time.monotonic()
         if curtime > self.time_start:
             return self.size / 1024**2 / (curtime - self.time_start)
         else:
             return 0
 
-    def print(self, message):
+    def print(self, message: str) -> None:
         print(" " * self.prev_len, end="\r")
         print(message, end="\r")
         self.prev_len = len(message)

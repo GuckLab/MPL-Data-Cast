@@ -1,3 +1,6 @@
+0.4.0
+ - feat: add first GUI that supports transfer of RTDC data (#3)
+ - enh: use type hints everywhere (#9)
 0.3.2
  - setup: add hdf5plugin to setup dependencies
 0.3.1

@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import traceback
 import uuid
+from typing import Type, Callable, List
 
 from .util import hashfile
 
@@ -21,9 +22,11 @@ IGNORED_FILE_NAMES = [
 class Recipe(ABC):
     #: Ignored files as specified by the recipe (an addition
     #: to `IGNORED_FILE_NAMES`)
-    ignored_file_names = []
+    ignored_file_names: List[str] = []
 
-    def __init__(self, path_raw, path_tar):
+    def __init__(self,
+                 path_raw: str | pathlib.Path,
+                 path_tar: str | pathlib.Path):
         """Base class recipe for data conversion
 
         Parameters
@@ -45,12 +48,12 @@ class Recipe(ABC):
         self.tempdir = pathlib.Path(tempfile.mkdtemp(prefix="MPL-Data-Cast_"))
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
-    def cast(self, path_callback=None, **kwargs):
+    def cast(self, path_callback: Callable = None, **kwargs) -> dict:
         """Cast the entire data tree to the target directory
 
         Parameters
         ----------
-        path_callback: callable
+        path_callback: Callable
             Callable function accepting a path; used for tracking
             the progress (e.g. via the CLI)
 
@@ -118,7 +121,7 @@ class Recipe(ABC):
             each item contains all files that belong to one dataset.
         """
 
-    def get_target_path(self, path_list):
+    def get_target_path(self, path_list: list) -> pathlib.Path:
         """Get the target path for a path_list
 
         The target path is computed such that these relative paths
@@ -141,15 +144,16 @@ class Recipe(ABC):
         target_path = self.path_tar / prel
         return target_path
 
-    def get_temp_path(self, path_list):
+    def get_temp_path(self, path_list: list) -> pathlib.Path:
         """Return a unique temporary file name"""
         hash1 = hashlib.md5(str(path_list[0]).encode("utf-8")).hexdigest()
         self.tempdir.mkdir(parents=True, exist_ok=True)
         return self.tempdir / f"{hash1}_{uuid.uuid4()}_{path_list[0].name}"
 
     @staticmethod
-    def transfer_to_target_path(temp_path, target_path,
-                                check_existing=True):
+    def transfer_to_target_path(temp_path: pathlib.Path,
+                                target_path: pathlib.Path,
+                                check_existing: bool = True) -> bool:
         """Transfer a file to another location
 
         Parameters
@@ -199,20 +203,20 @@ class Recipe(ABC):
         return success
 
 
-def get_available_recipe_names():
+def get_available_recipe_names() -> list[str]:
     names = []
     for cls in Recipe.__subclasses__():
         names.append(map_class_to_recipe_name(cls))
     return sorted(names)
 
 
-def map_class_to_recipe_name(cls):
+def map_class_to_recipe_name(cls: Type[Recipe]) -> str:
     cls_name = cls.__name__
     assert cls_name.endswith("Recipe")
     return cls_name[:-6]
 
 
-def map_recipe_name_to_class(recipe_name):
+def map_recipe_name_to_class(recipe_name: str) -> Type[Recipe]:
     for cls in Recipe.__subclasses__():
         if cls.__name__.lower() == recipe_name.lower() + "recipe":
             return cls

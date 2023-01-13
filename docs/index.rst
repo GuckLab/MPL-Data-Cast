@@ -12,6 +12,7 @@ Welcome to the MPL-Data-Cast documentation!
 
    sec_intro
    sec_cli
+   sec_gui
 
 
 

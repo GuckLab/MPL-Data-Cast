@@ -4,16 +4,27 @@ Introduction
 Installation
 ------------
 
-If you have Python installed, you can install MPL-Data-Cast with
+If you have Python installed, you can install MPL-Data-Cast with::
 
-```
-pip install mpl_data_cast
-```
+    pip install mpl_data_cast
 
-The :ref:`Command-line interface <sec_cli>` is available via the ``mpldc``
-command.
 
-A graphical user interface, including installers for Windows and macOS, is planned.
+The :ref:`Command-line interface <sec_cli>` is available via::
+
+    mpldc
+    # or
+    python -m mpl_data_cast.cli
+
+A graphical user interface (GUI), including installers for Windows and macOS,
+is currently under development. An initial GUI to use MPL-Data-Cast for
+transfering RT-DC data is already available. If you encounter bugs or have
+suggestions for improvement, open an issue on
+`GitHub <https://github.com/GuckLab/MPL-Data-Cast/issues>`_.
+To start the GUI, run::
+
+    mpldc-gui
+    # or
+    python -m mpl_data_cast.gui
 
 
 Motivation
@@ -57,8 +68,24 @@ addresses several data management issues:
 Design
 ------
 
-MPL-Data-Cast is a Python library with a command-line interface (CLI) on top
-that lets you apply a "recipe" to data files. A recipe defines how your
-acquisition data is transformed into the final raw data for your analysis
-pipeline. You can define your own recipes or use the recipes that come with
-MPL-Data-Cast.
+MPL-Data-Cast is a Python library with a command-line interface (CLI) and
+a very simple GUI on top that lets you apply a "recipe" to data files. A
+recipe defines how your acquisition data is transformed into the final raw data
+for your analysis pipeline. You can define your own recipes or use the recipes
+that come with MPL-Data-Cast.
+
+See also:
+
+- :ref:`Command-line interface <sec_cli>`
+- :ref:`Graphical user interface <sec_gui>`
+
+Good to know
+------------
+
+- MPL-Data-Cast does not create a directory with the same name as the input
+  directory in the output directory, it copies the content of the input
+  directory into the output directory. That means that you have to be careful when
+  entering the output path, or otherwise you might end up mixing up data.
+
+- Right now, it is not possible to copy only selected files or subfolders from
+  a given directory, you can only transfer complete directories.
