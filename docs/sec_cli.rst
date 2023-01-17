@@ -8,16 +8,16 @@ This section documents the output of the different commands
 (e.g. ``mpldc --help`` or ``mpldc cast --help``).
 
 
-.. click:: mpl_data_cast.cli:cli
+.. click:: mpl_data_cast.cli.cli:cli
    :prog: mpldc
    :nested: short
 
 
-.. click:: mpl_data_cast.cli:cast
+.. click:: mpl_data_cast.cli.cli:cast
    :prog: mpldc cast
    :nested: full
 
 
-.. click:: mpl_data_cast.cli:list_recipes
+.. click:: mpl_data_cast.cli.cli:list_recipes
    :prog: mpldc list-recipes
    :nested: full
