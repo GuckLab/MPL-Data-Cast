@@ -3,6 +3,9 @@ from PyQt6 import uic, QtCore, QtWidgets
 import pkg_resources
 
 
+from ..util import is_dir_writable
+
+
 class Preferences(QtWidgets.QDialog):
     """Preferences dialog"""
     feature_changed = QtCore.pyqtSignal()
@@ -107,4 +110,7 @@ class Preferences(QtWidgets.QDialog):
         p = QtWidgets.QFileDialog.getExistingDirectory(
             self,
             caption="Select output directory:")
-        self.rtdc_output_path.setText(str(p))
+        if is_dir_writable(p):
+            self.rtdc_output_path.setText(str(p))
+        else:
+            raise ValueError(f"Directory {p} is not writable!")

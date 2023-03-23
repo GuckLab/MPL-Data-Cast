@@ -74,3 +74,28 @@ def _hashfile_cached(path: pathlib.Path,
             if count and ii == count:
                 break
     return hasher.hexdigest()
+
+
+def is_dir_writable(path):
+    """Check whether a directory is writable
+
+    We could play around with os.access, but ultimately there will
+    always be some use case where that does not work. So we just try
+    to create a file in that directory and be done with it.
+    """
+    path = pathlib.Path(path)
+    if not path.exists():
+        writable = False
+    elif path.is_file():
+        writable = False
+    else:
+        test_file = path / ".write_test~"
+        try:
+            test_file.touch()
+        except BaseException:
+            writable = False
+        else:
+            writable = True
+        finally:
+            test_file.unlink(missing_ok=True)
+    return writable

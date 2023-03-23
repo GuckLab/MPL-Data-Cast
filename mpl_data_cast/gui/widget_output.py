@@ -3,6 +3,7 @@ import pkg_resources
 import pathlib
 
 from ..path_tree import PathTree, list_items_in_tree
+from ..util import is_dir_writable
 
 
 class OutputWidget(QtWidgets.QWidget):
@@ -66,18 +67,18 @@ class OutputWidget(QtWidgets.QWidget):
         output_dir: str or pathlib.Path
             The directory for the output.
         """
-        output_dir = pathlib.Path(output_dir)
-        if output_dir.exists():
+        if is_dir_writable(output_dir):
+            output_dir = pathlib.Path(output_dir)
             self.path = output_dir
             self.lineEdit_output.setText(str(output_dir))
             self.update_tree()
         else:
-            msg_txt = "The output directory is not valid, it does not seem" \
-                      " to exist."
+            msg_txt = f"The output directory '{output_dir}' is not valid. " \
+                      f"Please select a different directory."
             msg = QtWidgets.QMessageBox(self)
             msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msg.setText(msg_txt)
-            msg.setWindowTitle("Warning")
+            msg.setWindowTitle("Output directory invalid")
             msg.exec()
 
     def update_tree(self) -> None:
