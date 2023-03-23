@@ -26,8 +26,8 @@ setup(
     long_description=open('README.rst').read() if exists('README.rst') else '',
     install_requires=[
         "click>=8",
-        "dclab>=0.39.15",
-        "h5py>=3.6.0",
+        "dclab>=0.48.4",
+        "h5py>=3.8.0",
         "hdf5plugin",  # compression
         "numpy>=1.21",  # CVE-2021-33430
         "pyqt6",
