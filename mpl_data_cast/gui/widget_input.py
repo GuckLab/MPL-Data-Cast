@@ -27,9 +27,11 @@ class InputWidget(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def on_task_select_input_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
-            self,
-            caption="Select input directory:")
-        self.update_input_dir(p)
+            parent=self,
+            caption="Select input directory:",
+            directory=str(self.path) if self.path else None)
+        if p:
+            self.update_input_dir(p)
 
     def dragEnterEvent(self, e) -> None:
         """Whether files are accepted"""

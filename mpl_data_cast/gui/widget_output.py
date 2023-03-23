@@ -28,9 +28,11 @@ class OutputWidget(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def on_task_select_output_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
-            self,
-            caption="Select output directory:")
-        self.update_output_dir(p)
+            parent=self,
+            caption="Select output directory:",
+            directory=str(self.path) if self.path else None)
+        if p:
+            self.update_output_dir(p)
 
     def dragEnterEvent(self, e) -> None:
         """Whether files are accepted"""

@@ -108,9 +108,11 @@ class Preferences(QtWidgets.QDialog):
     @QtCore.pyqtSlot()
     def on_task_select_output_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
-            self,
-            caption="Select output directory:")
-        if is_dir_writable(p):
-            self.rtdc_output_path.setText(str(p))
-        else:
-            raise ValueError(f"Directory {p} is not writable!")
+            parent=self,
+            caption="Select output directory:",
+            directory=self.rtdc_output_path.text())
+        if p:
+            if is_dir_writable(p):
+                self.rtdc_output_path.setText(str(p))
+            else:
+                raise ValueError(f"Directory {p} is not writable!")
