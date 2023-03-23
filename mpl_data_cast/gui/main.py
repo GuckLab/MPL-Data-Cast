@@ -1,5 +1,6 @@
 import os
 import time
+import signal
 import sys
 import traceback
 import pathlib
@@ -229,6 +230,9 @@ def error(message: str, info: str = "", details: str = "") -> None:
         msg.setDetailedText(details)
     msg.exec()
 
+
+# Make Ctr+C close the app
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # Display exception hook in separate dialog instead of crashing
 sys.excepthook = excepthook
