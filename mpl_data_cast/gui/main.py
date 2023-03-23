@@ -213,7 +213,7 @@ def excepthook(etype, value, trace) -> None:
     ret = errorbox.exec()
     if ret == 1:
         cb = QtWidgets.QApplication.clipboard()
-        cb.clear(mode=cb.Clipboard)
+        cb.clear(mode=cb.Mode.Clipboard)
         cb.setText(exception)
 
 
