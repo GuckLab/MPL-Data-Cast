@@ -14,7 +14,8 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
     env:
       # Display must be available globally for linux to know where xvfb is
-      DISPLAY: :0
+      DISPLAY: ":0"
+      QT_SELECT: "qt6"
 
     steps:
     - uses: actions/checkout@v3
