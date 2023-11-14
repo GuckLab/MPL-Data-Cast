@@ -177,7 +177,7 @@ class Recipe(ABC):
         if target_path.exists():
             if check_existing:
                 # first check the size, then the hash
-                if (temp_path.stat().st_size != temp_path.stat().st_size
+                if (target_path.stat().st_size != temp_path.stat().st_size
                         or hashfile(target_path) != hash_ok):
                     # The file is not the same, delete it and try again.
                     target_path.unlink()
