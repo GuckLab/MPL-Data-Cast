@@ -151,8 +151,9 @@ class Recipe(ABC):
 
     def get_temp_path(self, path_list: list) -> pathlib.Path:
         """Return a unique temporary file name"""
-        hash1 = hashlib.md5(str(path_list[0]).encode("utf-8")).hexdigest()
         self.tempdir.mkdir(parents=True, exist_ok=True)
+        # Create a hash of the file path
+        hash1 = hashlib.md5(str(path_list[0]).encode("utf-8")).hexdigest()
         return self.tempdir / f"{hash1}_{uuid.uuid4()}_{path_list[0].name}"
 
     @staticmethod
