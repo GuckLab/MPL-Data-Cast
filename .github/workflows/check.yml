@@ -50,6 +50,6 @@ jobs:
         coverage run --source=mpl_data_cast -m pytest -x -k "not gui" tests
     - name: Lint with flake8
       run: |
-        flake8 .
+        flake8 --exclude _version.py .
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
