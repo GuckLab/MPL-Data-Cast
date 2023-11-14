@@ -16,4 +16,3 @@ datas += collect_data_files("mpl_data_cast", subdir="img")
 
 # Add the Zstandard library used by dclab
 datas += collect_data_files("hdf5plugin", includes=["plugins/libh5zstd.*"])
-
