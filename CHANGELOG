@@ -1,5 +1,6 @@
 0.5.0
  - fix: fast file size check for detecting invalid upload did not take place
+ - fix: delete temporary files when they are not needed anymore (#24)
  - setup: migrate to pyproject.toml
 0.4.2:
  - fix: properly check output directory (#20)

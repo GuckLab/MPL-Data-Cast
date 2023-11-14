@@ -21,7 +21,7 @@ def make_example_data():
 
 class DummyRecipe(Recipe):
     """A pipeline that just concatenates text files"""
-    def convert_dataset(self, path_list, temp_path):
+    def convert_dataset(self, path_list, temp_path, **kwargs):
         data = ""
         for pp in path_list:
             data += pp.read_text()
@@ -56,6 +56,24 @@ def test_pipeline_cast():
     assert text1 == "hello world!"
     text2 = (path_tar / "fliege" / "1.txt").read_text()
     assert text2 == "lorem ipsum dolor sit amet."
+
+
+def test_pipeline_cast_delete_after():
+    path_raw = make_example_data()
+    path_tar = pathlib.Path(tempfile.mkdtemp()) / "test"
+    pl = DummyRecipe(path_raw, path_tar)
+    input_list = sorted(pl.get_raw_data_iterator())
+    output_list = [pl.get_target_path(pi) for pi in input_list]
+    for po in output_list:
+        assert not po.exists()
+    ret = pl.cast()
+    assert ret["success"]
+    for po in output_list:
+        assert po.exists()
+    # This is the actual important test. The instance should remove
+    # temporary files as it transfers them.
+    temp_files = sorted(pl.tempdir.rglob("*.txt"))
+    assert len(temp_files) == 0
 
 
 def test_pipeline_get_target_path():

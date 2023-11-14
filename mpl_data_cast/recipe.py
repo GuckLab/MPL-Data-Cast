@@ -81,7 +81,9 @@ class Recipe(ABC):
                 errors.append((path_list[0], traceback.format_exc()))
                 continue
             ok = self.transfer_to_target_path(temp_path=temp_path,
-                                              target_path=targ_path)
+                                              target_path=targ_path,
+                                              delete_after=True,  # [sic!]
+                                              )
             if not ok:
                 raise ValueError(f"Transfer to {targ_path} failed!")
         # Walk the directory tree and copy any other files
@@ -98,9 +100,12 @@ class Recipe(ABC):
                 target_path = self.path_tar / prel
                 target_path.parent.mkdir(parents=True, exist_ok=True)
                 ok = self.transfer_to_target_path(temp_path=pp,
-                                                  target_path=target_path)
+                                                  target_path=target_path,
+                                                  delete_after=False,  # [sic!]
+                                                  )
                 if not ok:
                     raise ValueError(f"Transfer to {target_path} failed!")
+
         return {
             "success": not bool(errors),
             "errors": errors,
@@ -153,7 +158,9 @@ class Recipe(ABC):
     @staticmethod
     def transfer_to_target_path(temp_path: pathlib.Path,
                                 target_path: pathlib.Path,
-                                check_existing: bool = True) -> bool:
+                                check_existing: bool = True,
+                                delete_after: bool = False,
+                                ) -> bool:
         """Transfer a file to another location
 
         Parameters
@@ -165,6 +172,8 @@ class Recipe(ABC):
         check_existing: bool
             if `target_path` already exists, perform an MD5sum check
             and re-copy the file if the check fails
+        delete_after: bool
+            whether to delete `temp_path` after transfer
 
         Returns
         -------
@@ -184,7 +193,8 @@ class Recipe(ABC):
                     success = Recipe.transfer_to_target_path(
                         temp_path=temp_path,
                         target_path=target_path,
-                        check_existing=False
+                        check_existing=False,
+                        delete_after=False,  # [sic!]
                     )
                 else:
                     # The file is the same, everything is good.
@@ -200,6 +210,8 @@ class Recipe(ABC):
             hash_cp = hashfile(target_path)
             # compare md5hashes (verification)
             success = hash_ok == hash_cp
+        if success and delete_after:
+            temp_path.unlink(missing_ok=True)
         return success
 
 
