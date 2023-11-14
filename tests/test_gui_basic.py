@@ -22,7 +22,8 @@ def test_simple(qtbot):
     assert isinstance(mw.pushButton_transfer, QtWidgets.QPushButton)
     mw.close()
     QtTest.QTest.qWait(100)
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
 
 
 def test_on_action_about(qtbot):
@@ -35,7 +36,8 @@ def test_on_action_about(qtbot):
         mw.on_action_about()
         mw.close()
         QtTest.QTest.qWait(100)
-        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+        QtWidgets.QApplication.processEvents(
+            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
 
         assert mock_about.call_args.args[1] == \
                f"MPL-Data-Cast {mpl_data_cast.__version__}"

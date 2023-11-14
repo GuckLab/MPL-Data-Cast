@@ -25,7 +25,8 @@ def test_setting_paths(qtbot, tmp_path):
     assert mw.widget_output.p_tree.tree_depth == 1
     mw.close()
     QtTest.QTest.qWait(100)
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
 
 
 def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
@@ -59,7 +60,8 @@ def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
     tmp_dir.cleanup()
     mw.close()
     QtTest.QTest.qWait(100)
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
 
 
 def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
@@ -112,4 +114,5 @@ def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
     assert mw.widget_output.treeWidget_output.columnCount() == 4
     mw.close()
     QtTest.QTest.qWait(100)
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
