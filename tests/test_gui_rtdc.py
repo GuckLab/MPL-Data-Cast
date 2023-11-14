@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtTest, QtWidgets
 import pathlib
 import tempfile as tf
 import shutil
@@ -11,21 +11,29 @@ data_path = pathlib.Path(__file__).resolve().parent / "data"
 
 def test_setting_paths(qtbot, tmp_path):
     """Check that setting the input and output paths works."""
-    mpldc = MPLDataCast()
+    mw = MPLDataCast()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
+    QtTest.QTest.qWait(100)
     path_in = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
-    mpldc.widget_input.lineEdit_input.setText(str(path_in))
-    mpldc.widget_output.lineEdit_output.setText(str(tmp_path))
-    mpldc.widget_input.update_input_dir_from_lineedit()
-    mpldc.widget_output.update_output_dir_from_lineedit()
-    assert str(mpldc.widget_output.path) == str(tmp_path)
-    assert mpldc.widget_input.p_tree.tree_depth == 1
-    assert mpldc.widget_output.p_tree.tree_depth == 1
+    mw.widget_input.lineEdit_input.setText(str(path_in))
+    mw.widget_output.lineEdit_output.setText(str(tmp_path))
+    mw.widget_input.update_input_dir_from_lineedit()
+    mw.widget_output.update_output_dir_from_lineedit()
+    assert str(mw.widget_output.path) == str(tmp_path)
+    assert mw.widget_input.p_tree.tree_depth == 1
+    assert mw.widget_output.p_tree.tree_depth == 1
+    mw.close()
+    QtTest.QTest.qWait(100)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
 
 
 def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
     """Check that data is transfered when clicking on the button 'Transfer'."""
-    mpldc = MPLDataCast()
-    qtbot.add_widget(mpldc)
+    mw = MPLDataCast()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
+    QtTest.QTest.qWait(100)
 
     data = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
     test_file = data / "M001_data.rtdc"
@@ -36,10 +44,10 @@ def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
     assert tmp_path.exists()
     assert path_out.exists()
 
-    mpldc.widget_input.update_input_dir(tmp_path)
-    mpldc.widget_output.update_output_dir(path_out)
+    mw.widget_input.update_input_dir(tmp_path)
+    mw.widget_output.update_output_dir(path_out)
 
-    bt = mpldc.pushButton_transfer
+    bt = mw.pushButton_transfer
 
     # Monkeypatch message box to always return OK
     monkeypatch.setattr(QtWidgets.QMessageBox,
@@ -49,14 +57,20 @@ def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
 
     assert (path_out / "M001_data.rtdc").exists()
     tmp_dir.cleanup()
+    mw.close()
+    QtTest.QTest.qWait(100)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
 
 
 def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
     """Check that data is transfered when clicking on the button 'Transfer'.
     Now includes subdirectories"""
-    mpldc = MPLDataCast()
-    mpldc.settings.clear()
-    qtbot.add_widget(mpldc)
+    mw = MPLDataCast()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
+    QtTest.QTest.qWait(100)
+
+    mw.settings.clear()
 
     data = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
     test_file = data / "M001_data.rtdc"
@@ -79,11 +93,11 @@ def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
     assert tmp_file2.exists()
     assert len(list(path_out.rglob("*.rtdc"))) == 0
 
-    mpldc.widget_input.update_input_dir(path_in)
-    mpldc.widget_output.update_output_dir(path_out)
-    assert mpldc.widget_output.p_tree.tree_depth == 1
+    mw.widget_input.update_input_dir(path_in)
+    mw.widget_output.update_output_dir(path_out)
+    assert mw.widget_output.p_tree.tree_depth == 1
 
-    bt = mpldc.pushButton_transfer
+    bt = mw.pushButton_transfer
 
     # Monkeypatch message box to always return OK
     monkeypatch.setattr(QtWidgets.QMessageBox,
@@ -93,6 +107,9 @@ def test_transfer_data_advanced(qtbot, tmp_path, monkeypatch):
 
     assert tmp_file1.exists()
     assert tmp_file2.exists()
-    assert mpldc.widget_output.p_tree.tree_depth == 3
-    assert mpldc.widget_input.treeWidget_input.columnCount() == 4
-    assert mpldc.widget_output.treeWidget_output.columnCount() == 4
+    assert mw.widget_output.p_tree.tree_depth == 3
+    assert mw.widget_input.treeWidget_input.columnCount() == 4
+    assert mw.widget_output.treeWidget_output.columnCount() == 4
+    mw.close()
+    QtTest.QTest.qWait(100)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
