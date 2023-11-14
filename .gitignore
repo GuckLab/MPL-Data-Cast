@@ -130,3 +130,5 @@ dmypy.json
 
 .idea
 _version_save.py
+_version.py
+

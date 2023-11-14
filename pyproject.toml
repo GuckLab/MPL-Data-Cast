@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=46", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mpl_data_cast"
+authors = [
+    # In alphabetical order.
+    {name = "Benedikt Hartmann"},
+    {name = "Paul Müller"},
+]
+maintainers = [
+    {name = "Paul Müller", email="dev@craban.de"},
+]
+description = "convert and transfer data to network shares"
+readme = "README.rst"
+requires-python = ">=3.10, <4"
+keywords = ["Data maintenance", "MPL", "Max Planck"]
+classifiers = [
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Intended Audience :: Science/Research',
+]
+license = {text = "GPL v3"}
+dependencies = [
+    "click>=8",
+    "dclab>=0.55.5",
+    "h5py>=3.8.0",
+    "hdf5plugin",  # compression
+    "numpy>=1.21",  # CVE-2021-33430
+    "pyqt6",
+    "tifffile==2022.3.16",
+]
+dynamic = ["version"]
+
+[project.scripts]
+mpldc-gui = "mpl_data_cast.gui.__main__:main"
+mpldc = "mpl_data_cast.cli.cli:cli"
+
+[project.urls]
+source = "https://github.com/GuckLab/MPL-Data-Cast"
+tracker = "https://github.com/GuckLab/MPL-Data-Cast/issues"
+documentation = "https://mpl-data-cast.readthedocs.io"
+changelog = "https://github.com/GuckLab/MPL-Data-Cast/blob/main/CHANGELOG"
+
+[tool.setuptools]
+packages = ["mpl_data_cast"]
+
+[tool.setuptools_scm]
+write_to = "mpl_data_cast/_version.py"
+version_scheme = "post-release"
