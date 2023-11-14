@@ -47,7 +47,7 @@ jobs:
     - name: Test with pytest (Linux)
       if: runner.os == 'Linux'
       run: |
-        sudo xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" coverage run --source=mpl_data_cast -m pytest -x tests
+        sudo xvfb-run --auto-servernum --server-num=1 --server-args="-screen 1 1920x1200x24 -ac +extension GLX" `which coverage` run --source=mpl_data_cast -m pytest -x tests
     - name: Test with pytest without GUI tests (macOS)
       if: runner.os == 'macOS'
       run: |
