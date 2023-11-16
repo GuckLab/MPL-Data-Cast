@@ -45,7 +45,7 @@ jobs:
       working-directory: ./build-recipes
       run: |
         pip install -r win_build_requirements.txt
-        pyinstaller -y --log-level=WARN win_MPL-Data-Cast.spec
+        pyinstaller -y --log-level=WARN win_MPLDataCast.spec
         # Run the binary (the most simple test)
         dist\\MPL-Data-Cast\\MPLDataCast.exe --version
         python win_make_iss.py
