@@ -38,7 +38,7 @@ jobs:
         python -m pip install coverage flake8 pytest pytest-qt
     - name: Install package
       run: |
-        pip install -e .
+        pip install .
     - name: List installed packages
       run: |
         pip freeze
