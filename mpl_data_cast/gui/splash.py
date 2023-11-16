@@ -1,6 +1,6 @@
 try:
     import pyi_splash
-except ImportError:
+except (ImportError, KeyError):
     pyi_splash = None
 
 
