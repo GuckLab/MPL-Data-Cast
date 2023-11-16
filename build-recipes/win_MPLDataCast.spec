@@ -16,8 +16,6 @@ a = Analysis([NAME + "Launcher.py"],
              hookspath=["."],
              runtime_hooks=None)
 
-options = [ ('u', None, 'OPTION'), ('W ignore', None, 'OPTION') ]
-
 pyz = PYZ(a.pure)
 
 splash = Splash('../docs/artwork/mpldc_splash.png',
@@ -31,7 +29,7 @@ splash = Splash('../docs/artwork/mpldc_splash.png',
 exe = EXE(pyz,
           a.scripts,
           splash,
-          options,
+          [],
           exclude_binaries=True,
           name=NAME + ".exe",
           debug=False,

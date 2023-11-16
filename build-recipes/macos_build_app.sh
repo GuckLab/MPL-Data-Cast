@@ -36,7 +36,7 @@ rm -rf ./dist
 
 pip install -r macos_build_requirements.txt
 
-pyinstaller -y --log-level=WARN ${SPEC}
+pyinstaller -y ${SPEC}
 
 # Test the binary by executing it with --version argument
 echo ""
