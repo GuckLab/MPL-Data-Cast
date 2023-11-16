@@ -19,8 +19,18 @@ a = Analysis([NAME + "Launcher.py"],
 options = [ ('u', None, 'OPTION'), ('W ignore', None, 'OPTION') ]
 
 pyz = PYZ(a.pure)
+
+splash = Splash('../docs/artwork/mpldc_splash.png',
+                binaries=a.binaries,
+                datas=a.datas,
+                text_pos=(44, 163),
+                text_size=10,
+                text_color='black',
+                minify_script=True)
+
 exe = EXE(pyz,
           a.scripts,
+          splash,
           options,
           exclude_binaries=True,
           name=NAME + ".exe",
@@ -34,6 +44,7 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
+               splash.binaries,
                strip=False,
                upx=False,
                name=NAME)

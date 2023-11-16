@@ -10,10 +10,13 @@ import numpy
 import pkg_resources
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
-from . import preferences
 from ..recipe import IGNORED_FILE_NAMES
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
 from .._version import version
+
+from . import preferences
+from . import splash
+
 
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
@@ -60,6 +63,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         self.show()
         self.raise_()
+        splash.splash_close()
 
     @QtCore.pyqtSlot()
     def on_action_preferences(self):
