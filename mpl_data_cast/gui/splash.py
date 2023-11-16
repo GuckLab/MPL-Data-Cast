@@ -1,7 +1,12 @@
-try:
-    import pyi_splash
-except (ImportError, KeyError):
-    pyi_splash = None
+import platform
+
+pyi_splash = None
+if platform.system() in ["Linux", "Windows"]:
+    # Don't even try this on macOS.
+    try:
+        import pyi_splash
+    except (ImportError, KeyError):
+        pass
 
 
 def splash_close():

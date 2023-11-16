@@ -12,7 +12,7 @@ from PyInstaller.utils.hooks import collect_data_files
 
 # Data files
 datas = collect_data_files("mpl_data_cast", include_py_files=True)
-datas += collect_data_files("mpl_data_cast", subdir="img")
+datas += collect_data_files("mpl_data_cast", subdir="gui/img")
 
 # Add the Zstandard library used by dclab
 datas += collect_data_files("hdf5plugin", includes=["plugins/libh5zstd.*"])
