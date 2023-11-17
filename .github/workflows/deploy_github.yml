@@ -17,6 +17,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Set env
+      shell: bash
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
