@@ -14,6 +14,7 @@ jobs:
       matrix:
         python-version: ["3.10"]
         os: [macos-latest, windows-latest]
+    timeout-minutes: 30
     steps:
     - name: Set env
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV

@@ -15,7 +15,7 @@ def main():
     icon_path = os.path.join(imdir, "mpldc_icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))
 
-    window = MPLDataCast()
+    window = MPLDataCast()  # noqa: F841
 
     sys.exit(app.exec())
 
