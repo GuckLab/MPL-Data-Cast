@@ -12,7 +12,7 @@ from PyQt6 import uic, QtCore, QtGui, QtWidgets
 
 from ..recipe import IGNORED_FILE_NAMES
 from ..mod_recipes.rcp_rtdc import RTDCRecipe
-from .._version import __version__
+from .._version import version
 
 from . import preferences
 from . import splash
@@ -34,7 +34,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
-            print(__version__)
+            print(version)
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
             sys.exit(0)

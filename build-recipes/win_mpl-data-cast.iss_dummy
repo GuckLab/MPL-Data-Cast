@@ -9,7 +9,7 @@
 #define MyAppURL "https://mpl.mpg.de"
 #define MyAppPlatform "win32"
 #define MyAppExeName "MPLDataCast.exe"
-#define MyAppDir = SourcePath + "dist\MPL-Data-Cast\"
+#define MyAppDir = SourcePath + "dist\MPLDataCast\"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
