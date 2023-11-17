@@ -4,10 +4,15 @@ Introduction
 Installation
 ------------
 
+For Windows and macOS users, there are installers available at the
+`release page <https://github.com/GuckLab/MPL-Data-Cast/releases>`_. The
+Windows installer also includes the :ref:`command line interface (CLI) <sec_cli>`
+``mpldc.exe``.
+
+
 If you have Python installed, you can install MPL-Data-Cast with::
 
     pip install mpl_data_cast
-
 
 The :ref:`Command-line interface <sec_cli>` is available via::
 
@@ -15,16 +20,18 @@ The :ref:`Command-line interface <sec_cli>` is available via::
     # or
     python -m mpl_data_cast.cli
 
-A graphical user interface (GUI), including installers for Windows and macOS,
-is currently under development. An initial GUI to use MPL-Data-Cast for
-transfering RT-DC data is already available. If you encounter bugs or have
-suggestions for improvement, open an issue on
-`GitHub <https://github.com/GuckLab/MPL-Data-Cast/issues>`_.
 To start the GUI, run::
 
     mpldc-gui
     # or
     python -m mpl_data_cast.gui
+
+
+Issue tracker
+-------------
+
+If you encounter bugs or have suggestions for improvement, open an issue on
+`GitHub <https://github.com/GuckLab/MPL-Data-Cast/issues>`_.
 
 
 Motivation

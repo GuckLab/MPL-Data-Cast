@@ -24,7 +24,7 @@ classifiers = [
 license = {text = "GPL v3"}
 dependencies = [
     "click>=8",
-    "dclab>=0.55.5",
+    "dclab>=0.55.6",
     "h5py>=3.8.0",
     "hdf5plugin",  # compression
     "numpy>=1.21",  # CVE-2021-33430

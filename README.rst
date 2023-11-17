@@ -13,8 +13,8 @@ The documentation, including the code reference and examples, is available at
 
 Installation
 ------------
-..
-   Installers for Windows and macOS are available at the `release page <https://github.com/GuckLab/MPL-Data-Cast/releases>`__.
+
+Installers for Windows and macOS are available at the `release page <https://github.com/GuckLab/MPL-Data-Cast/releases>`__.
 
 If you have Python 3 installed, you can install MPL-Data-Cast with
 

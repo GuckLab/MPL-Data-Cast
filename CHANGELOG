@@ -1,5 +1,8 @@
+0.5.2
+ - build: add mpldc.exe CLI to Windows binary release
+ - setup: bump dclab to 0.55.6
 0.5.1
- - setup: introduce windows and macOS binary releases (#22)
+ - build: introduce Windows and macOS binary releases (#22)
 0.5.0
  - fix: fast file size check for detecting invalid upload did not take place
  - fix: delete temporary files when they are not needed anymore (#24)
