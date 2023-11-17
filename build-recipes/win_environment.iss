@@ -1,3 +1,5 @@
+[Code]
+
 const EnvironmentKey = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
 
 procedure EnvAddPath(Path: string);
