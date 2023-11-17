@@ -33,7 +33,7 @@ Testing
     pytest tests
 
 
-.. |MPL-Data-Cast| image:: https://raw.github.com/GuckLab/MPL-Data-Cast/master/docs/logo/MPL-Data-Cast_h50.png
+.. |MPL-Data-Cast| image:: https://raw.github.com/GuckLab/MPL-Data-Cast/master/docs/artwork/mpldc_splash.png
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/MPL-Data-Cast.svg
    :target: https://pypi.python.org/pypi/MPL-Data-Cast
 .. |Build Status| image:: https://img.shields.io/github/actions/workflow/status/GuckLab/MPL-Data-Cast/check.yml
