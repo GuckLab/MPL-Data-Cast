@@ -10,7 +10,6 @@
 #define MyAppPlatform "win32"
 #define MyAppExeName "MPLDataCast.exe"
 #define MyAppDir = SourcePath + "dist\MPLDataCast\"
-#include "win_environment.iss"
 
 [Setup]
 ChangesEnvironment=true
@@ -44,8 +43,6 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-
-Name: envPath; Description: "Add to PATH variable (required for mpldc.exe CLI)"
 
 [Files]
 Source: "{#MyAppDir}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -117,16 +114,4 @@ begin
       UnInstallOldVersion();
     end;
   end;
-  if (CurStep = ssPostInstall) and IsTaskSelected('envPath') then
-  begin
-    EnvAddPath(ExpandConstant('{app}') +'\bin');
-  end;
-end;
-
-procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-begin
-    if CurUninstallStep = usPostUninstall then
-    begin
-      EnvRemovePath(ExpandConstant('{app}') +'\bin');
-    end;
 end;

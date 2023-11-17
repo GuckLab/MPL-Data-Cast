@@ -7,7 +7,9 @@ Installation
 For Windows and macOS users, there are installers available at the
 `release page <https://github.com/GuckLab/MPL-Data-Cast/releases>`_. The
 Windows installer also includes the :ref:`command line interface (CLI) <sec_cli>`
-``mpldc.exe``.
+``mpldc.exe``. You might want to add the installation directory to your Windows
+PATH variable for conveniently using the CLI (see e.g.
+`this guide <https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)>`_).
 
 
 If you have Python installed, you can install MPL-Data-Cast with::
