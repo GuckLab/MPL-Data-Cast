@@ -10,7 +10,7 @@
 #define MyAppPlatform "win32"
 #define MyAppExeName "MPLDataCast.exe"
 #define MyAppDir = SourcePath + "dist\MPLDataCast\"
-#include "environment.iss"
+#include "win_environment.iss"
 
 [Setup]
 ChangesEnvironment=true
