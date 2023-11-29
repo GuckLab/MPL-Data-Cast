@@ -170,7 +170,10 @@ class Recipe(ABC):
         temp_path: pathlib.Path
             input file to be transferred
         target_path: pathlib.Path
-            target location of the output file (including file name)
+            target location of the output file (including file name).
+            If the target path exists but has the wrong size, it is replaced
+            with the input file, regardless of the `check_existing`
+            kwarg.
         check_existing: bool
             if `target_path` already exists, perform an MD5sum check
             and re-copy the file if the check fails
@@ -185,14 +188,19 @@ class Recipe(ABC):
             whether everything went as planned
         """
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        # compute md5hash of temp_path
+
+        # Quick check for size (probably a partial transfer)
+        if (target_path.exists()
+                and target_path.stat().st_size != temp_path.stat().st_size):
+            # remove target path with mismatch in size
+            target_path.unlink()
+
         if target_path.exists():
             if check_existing:
                 if hash_input is None:
                     hash_input = hashfile(temp_path)
                 # first check the size, then the hash
-                if (target_path.stat().st_size != temp_path.stat().st_size
-                        or hashfile(target_path) != hash_input):
+                if hashfile(target_path) != hash_input:
                     # The file is not the same, delete it and try again.
                     target_path.unlink()
                     success = Recipe.transfer_to_target_path(

@@ -112,17 +112,30 @@ def test_transfer_to_target_path_check_existing(tmp_path):
     assert pin.read_text() == pout.read_text() == "peter"
 
 
-def test_transfer_to_target_path_check_existing_control(tmp_path):
+def test_transfer_to_target_path_check_existing_file_size(tmp_path):
     pin = tmp_path / "test.txt"
     pin.write_text("peter")
     pout = tmp_path / "out.txt"
-    pout.write_text("hans")
+    pout.write_text("hans")  # has different file size -> deleted
     assert Recipe.transfer_to_target_path(temp_path=pin,
                                           target_path=pout,
                                           check_existing=False,
                                           )
     assert pin.read_text() == "peter"
-    assert pout.read_text() == "hans"
+    assert pout.read_text() == "peter"
+
+
+def test_transfer_to_target_path_check_existing_control(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    pout.write_text("hanse")  # must have same size
+    assert Recipe.transfer_to_target_path(temp_path=pin,
+                                          target_path=pout,
+                                          check_existing=False,
+                                          )
+    assert pin.read_text() == "peter"
+    assert pout.read_text() == "hanse"
 
 
 def test_transfer_to_target_path_delete_after(tmp_path):

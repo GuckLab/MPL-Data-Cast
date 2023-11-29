@@ -2,6 +2,7 @@
  - feat: generalize GUI to use all recipes
  - enh: compute file hash while copying, avoiding reading data twice
  - enh: handle PermissionError when building directory tree
+ - enh: identify existing target paths based on size quicker
  - ref: migrate from pkg_resources to importlib.resources
  - ref: unify input and output tree widget with one base class
 0.5.2
