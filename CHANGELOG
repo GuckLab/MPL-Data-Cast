@@ -1,5 +1,6 @@
 0.6.0
  - feat: generalize GUI to use all recipes
+ - enh: compute file hash while copying, avoiding reading data twice
  - ref: migrate from pkg_resources to importlib.resources
 0.5.2
  - build: add mpldc.exe CLI to Windows binary release

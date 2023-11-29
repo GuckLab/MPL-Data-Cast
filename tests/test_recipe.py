@@ -1,3 +1,4 @@
+import hashlib
 import pathlib
 import tempfile
 
@@ -21,6 +22,7 @@ def make_example_data():
 
 class DummyRecipe(Recipe):
     """A pipeline that just concatenates text files"""
+
     def convert_dataset(self, path_list, temp_path, **kwargs):
         data = ""
         for pp in path_list:
@@ -87,3 +89,73 @@ def test_pipeline_get_target_path():
 
     tar2 = path_tar / "hans" / "peter" / "a.txt"
     assert str(pl.get_target_path(pl.get_raw_data_iterator()[1])) == str(tar2)
+
+
+def test_transfer_to_target_path_basic(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    assert Recipe.transfer_to_target_path(temp_path=pin,
+                                          target_path=pout)
+    assert pin.read_text() == pout.read_text() == "peter"
+
+
+def test_transfer_to_target_path_check_existing(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    pout.write_text("hans")
+    assert Recipe.transfer_to_target_path(temp_path=pin,
+                                          target_path=pout,
+                                          check_existing=True,
+                                          )
+    assert pin.read_text() == pout.read_text() == "peter"
+
+
+def test_transfer_to_target_path_check_existing_control(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    pout.write_text("hans")
+    assert Recipe.transfer_to_target_path(temp_path=pin,
+                                          target_path=pout,
+                                          check_existing=False,
+                                          )
+    assert pin.read_text() == "peter"
+    assert pout.read_text() == "hans"
+
+
+def test_transfer_to_target_path_delete_after(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    assert Recipe.transfer_to_target_path(temp_path=pin,
+                                          target_path=pout,
+                                          delete_after=True,
+                                          )
+    assert pout.read_text() == "peter"
+    assert not pin.exists()
+
+
+def test_transfer_to_target_path_hash_input(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    assert Recipe.transfer_to_target_path(
+        temp_path=pin,
+        target_path=pout,
+        hash_input=hashlib.md5(b"peter").hexdigest())
+    assert pout.read_text() == "peter"
+
+
+def test_transfer_to_target_path_hash_input_control(tmp_path):
+    pin = tmp_path / "test.txt"
+    pin.write_text("peter")
+    pout = tmp_path / "out.txt"
+    assert not Recipe.transfer_to_target_path(
+        temp_path=pin,
+        target_path=pout,
+        hash_input=hashlib.md5(b"hans").hexdigest())
+    assert pin.exists()
+    assert pin.read_text() == "peter"
+    assert not pout.exists()

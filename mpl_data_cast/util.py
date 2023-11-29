@@ -2,11 +2,41 @@
 import functools
 import hashlib
 import pathlib
+import shutil
 from typing import Callable
 
 
+DEFAULT_BLOCK_SIZE = 4 * (1024 ** 2)
+
+
+def copyhashfile(path_in: str | pathlib.Path,
+                 path_out: str | pathlib.Path,
+                 blocksize: int = DEFAULT_BLOCK_SIZE,
+                 constructor: Callable = hashlib.md5) -> str:
+    """Copy a file while computing its md5sum
+
+    Parameters
+    ----------
+    path_in:
+        Input path
+    path_out:
+        Output path
+    blocksize: int
+        Number of bytes to copy at once
+    constructor:
+        Which hash to use
+    """
+    hasher = constructor()
+    with path_in.open('rb') as fd, path_out.open("wb") as fo:
+        while buf := fd.read(blocksize):
+            hasher.update(buf)
+            fo.write(buf)
+    shutil.copystat(path_in, path_out)
+    return hasher.hexdigest()
+
+
 def hashfile(fname: str | pathlib.Path,
-             blocksize: int = 65536,
+             blocksize: int = DEFAULT_BLOCK_SIZE,
              count: int = 0,
              constructor: Callable = hashlib.md5) -> str:
     """Compute md5 hex-hash of a file
@@ -37,7 +67,7 @@ def hashfile(fname: str | pathlib.Path,
 @functools.lru_cache(maxsize=100)
 def _hashfile_cached(path: pathlib.Path,
                      path_stats: tuple,
-                     blocksize: int = 65536,
+                     blocksize: int = DEFAULT_BLOCK_SIZE,
                      count: int = 0,
                      constructor: Callable = hashlib.md5) -> str:
     """Cached hashfile using stat tuple as cache
@@ -65,11 +95,9 @@ def _hashfile_cached(path: pathlib.Path,
     assert path_stats, "We need stat for validating the cache"
     hasher = constructor()
     with path.open('rb') as fd:
-        buf = fd.read(blocksize)
         ii = 0
-        while len(buf) > 0:
+        while buf := fd.read(blocksize):
             hasher.update(buf)
-            buf = fd.read(blocksize)
             ii += 1
             if count and ii == count:
                 break

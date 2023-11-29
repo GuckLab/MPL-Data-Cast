@@ -40,5 +40,5 @@ def test_on_action_about(qtbot):
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 5000)
 
         assert mock_about.call_args.args[1] == \
-               f"MPL-Data-Cast {mpl_data_cast.__version__}"
+            f"MPL-Data-Cast {mpl_data_cast.__version__}"
         assert "MPL-Data-Cast" in mock_about.call_args.args[2]

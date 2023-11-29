@@ -8,7 +8,7 @@ import traceback
 import uuid
 from typing import Type, Callable, List
 
-from .util import hashfile
+from .util import hashfile, copyhashfile
 
 
 #: Files that are not copied (unless specified explicitly by a recipe)
@@ -161,6 +161,7 @@ class Recipe(ABC):
                                 target_path: pathlib.Path,
                                 check_existing: bool = True,
                                 delete_after: bool = False,
+                                hash_input: str = None
                                 ) -> bool:
         """Transfer a file to another location
 
@@ -175,6 +176,8 @@ class Recipe(ABC):
             and re-copy the file if the check fails
         delete_after: bool
             whether to delete `temp_path` after transfer
+        hash_input: str
+            optional hash of the input file
 
         Returns
         -------
@@ -183,12 +186,13 @@ class Recipe(ABC):
         """
         target_path.parent.mkdir(parents=True, exist_ok=True)
         # compute md5hash of temp_path
-        hash_ok = hashfile(temp_path)
         if target_path.exists():
             if check_existing:
+                if hash_input is None:
+                    hash_input = hashfile(temp_path)
                 # first check the size, then the hash
                 if (target_path.stat().st_size != temp_path.stat().st_size
-                        or hashfile(target_path) != hash_ok):
+                        or hashfile(target_path) != hash_input):
                     # The file is not the same, delete it and try again.
                     target_path.unlink()
                     success = Recipe.transfer_to_target_path(
@@ -196,6 +200,7 @@ class Recipe(ABC):
                         target_path=target_path,
                         check_existing=False,
                         delete_after=False,  # [sic!]
+                        hash_input=hash_input,
                     )
                 else:
                     # The file is the same, everything is good.
@@ -206,11 +211,18 @@ class Recipe(ABC):
                 success = True
         else:
             # transfer to target_path
-            shutil.copy2(temp_path, target_path)
+            if hash_input is None:
+                hash_input = copyhashfile(temp_path, target_path)
+            else:
+                shutil.copy2(temp_path, target_path)
             # compute md5hash of target path
             hash_cp = hashfile(target_path)
             # compare md5hashes (verification)
-            success = hash_ok == hash_cp
+            success = hash_input == hash_cp
+            if not success:
+                # Since we copied the wrong file, we are responsible for
+                # deleting it.
+                target_path.unlink(missing_ok=True)
         if success and delete_after:
             temp_path.unlink(missing_ok=True)
         return success
