@@ -88,6 +88,8 @@ class MPLDataCast(QtWidgets.QMainWindow):
             "main/tree_depth_limit", 8))
         self.widget_input.tree_depth_limit = int(self.settings.value(
             "main/tree_depth_limit", 8))
+        self.widget_output.update_tree_dir(self.settings.value(
+            "main/output_path", pathlib.Path.home()))
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
@@ -146,6 +148,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         with Callback(self, nb_files) as path_callback:
             result = rp.cast(path_callback=path_callback)
         if result["success"]:
+            self.progressBar.setValue(100)
             QtWidgets.QMessageBox.information(self, "Transfer completed",
                                               "Data transfer completed.")
             self.progressBar.setValue(0)
@@ -190,19 +193,11 @@ class Callback:
         pass
 
     def __call__(self, path) -> None:
-        self.counter += 1
         self.size += path.stat().st_size
         self.gui.progressBar.setValue(int(self.counter / self.max_count * 100))
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
-
-    def get_rate(self) -> float:
-        """Calculate processing rate in MB/s"""
-        curtime = time.monotonic()
-        if curtime > self.time_start:
-            return self.size / 1024 ** 2 / (curtime - self.time_start)
-        else:
-            return 0
+        self.counter += 1
 
 
 def excepthook(etype, value, trace) -> None:
