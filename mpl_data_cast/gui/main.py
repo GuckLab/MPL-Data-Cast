@@ -1,4 +1,3 @@
-import os
 import time
 import signal
 import sys
@@ -8,28 +7,22 @@ import dclab
 import h5py
 import numpy
 import pkg_resources
-from PyQt6 import uic, QtCore, QtGui, QtWidgets
+from PyQt6 import uic, QtCore, QtWidgets
 
-from ..recipe import IGNORED_FILE_NAMES
-from ..mod_recipes.rcp_rtdc import RTDCRecipe
+from .. import recipe as mpldc_recipe
 from .._version import version
 
 from . import preferences
 from . import splash
 
 
-# set Qt icon theme search path
-QtGui.QIcon.setThemeSearchPaths([
-    os.path.join(pkg_resources.resource_filename("mpl_data_cast", "img"),
-                 "icon-theme")])
-QtGui.QIcon.setThemeName(".")
-
-
 class MPLDataCast(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         """Initialize MPL-Data-Cast"""
+        # Settings apply to promoted widgets as well
         QtCore.QCoreApplication.setOrganizationName("MPL")
         QtCore.QCoreApplication.setApplicationName("MPL-Data-Cast")
+        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
         super(MPLDataCast, self).__init__(*args, **kwargs)
 
         # if "--version" was specified, print the version and exit
@@ -44,17 +37,18 @@ class MPLDataCast(QtWidgets.QMainWindow):
         uic.loadUi(path_ui, self)
 
         # settings
-        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
         self.settings = QtCore.QSettings()
-        # self.settings.setIniCodec("utf-8")
+
+        # Populate the recipe list
+        recipes = mpldc_recipe.get_available_recipe_names()
+        for rr in recipes:
+            self.comboBox_recipe.addItem(rr, rr)
+        # Set default recipe to "CatchAll"
+        default = recipes.index("CatchAll")
+        self.comboBox_recipe.setCurrentIndex(default)
+        self.on_recipe_changed()
 
         # load some values from the settings
-        self.widget_output.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 3))
-        self.widget_input.tree_depth_limit = int(self.settings.value(
-            "rtdc/tree_depth_limit", 3))
-        self.widget_output.update_output_dir(
-            self.settings.value("rtdc/output_path", str(pathlib.Path.cwd())))
         # signals
         self.pushButton_transfer.clicked.connect(self.on_task_transfer)
         # GUI
@@ -68,28 +62,34 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
 
+        # Recipe selection
+        self.comboBox_recipe.currentIndexChanged.connect(
+            self.on_recipe_changed)
+
         self.show()
         self.raise_()
         splash.splash_close()
 
+    @property
+    def current_recipe(self):
+        name = self.comboBox_recipe.currentData()
+        return mpldc_recipe.map_recipe_name_to_class(name)
+
     @QtCore.pyqtSlot()
     def on_action_preferences(self):
         """Show the preferences dialog"""
-        prev_tree_depth_limit = self.settings.value("rtdc/tree_depth_limit", 8)
+
         dlg = preferences.Preferences(self)
         dlg.setWindowTitle("MPL-Data-Cast Preferences")
         dlg.exec()
-        # update maximum tree depth if necessary
-        if self.settings.value("rtdc/tree_depth_limit",
-                               8) != prev_tree_depth_limit:
-            self.widget_output.tree_depth_limit = int(self.settings.value(
-                "rtdc/tree_depth_limit", 8))
-            self.widget_input.tree_depth_limit = int(self.settings.value(
-                "rtdc/tree_depth_limit", 8))
-            if self.widget_output.path is not None:
-                self.widget_output.update_output_dir(self.widget_output.path)
-            if self.widget_input.path is not None:
-                self.widget_input.update_input_dir(self.widget_input.path)
+        # update maximum tree depth
+        self.widget_output.tree_depth_limit = int(self.settings.value(
+            "main/tree_depth_limit", 8))
+        self.widget_input.tree_depth_limit = int(self.settings.value(
+            "main/tree_depth_limit", 8))
+        # update output dir
+        self.widget_output.update_output_dir(self.settings.value(
+            "main/output_path"))
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
@@ -137,11 +137,13 @@ class MPLDataCast(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(self, "Error",
                                               "Output directory not correct!")
 
-        rp = RTDCRecipe(self.widget_input.path, self.widget_output.path)
+        rp = self.current_recipe(self.widget_input.path,
+                                 self.widget_output.path)
 
         nb_files = 0  # counter for files, used for progress bar
         for elem in self.widget_input.path.rglob("*"):
-            if elem.is_file() and elem.name not in IGNORED_FILE_NAMES:
+            if (elem.is_file()
+                    and elem.name not in mpldc_recipe.IGNORED_FILE_NAMES):
                 nb_files += 1
         with Callback(self, nb_files) as path_callback:
             result = rp.cast(path_callback=path_callback)
@@ -163,6 +165,13 @@ class MPLDataCast(QtWidgets.QMainWindow):
             for path, tb in result["errors"]:
                 text += f"PATH {path}:\n{tb}\n\n"
             pathlib.Path("mpldc-dump.txt").write_text(text)
+
+    @QtCore.pyqtSlot()
+    def on_recipe_changed(self):
+        # Update the recipe description
+        rec_cls = self.current_recipe
+        doc = rec_cls.__doc__.split("\n")[0]
+        self.label_recipe_descr.setText(f"*{doc}*")
 
 
 class Callback:

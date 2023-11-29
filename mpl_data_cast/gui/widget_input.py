@@ -13,11 +13,12 @@ class InputWidget(QtWidgets.QWidget):
 
         path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
                                                   "widget_input.ui")
-        uic.loadUi(path_ui, self)
-
         self.path = None
         self.p_tree = None
-        self.tree_depth_limit = 3
+        self.settings = QtCore.QSettings()
+        self.tree_depth_limit = int(self.settings.value(
+            "main/tree_depth_limit", 3))
+        uic.loadUi(path_ui, self)
 
         self.pushButton_input_dir.clicked.connect(
             self.on_task_select_input_dir)

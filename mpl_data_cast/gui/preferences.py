@@ -1,7 +1,8 @@
 import pathlib
-from PyQt6 import uic, QtCore, QtWidgets
 import pkg_resources
+import warnings
 
+from PyQt6 import uic, QtCore, QtWidgets
 
 from ..util import is_dir_writable
 
@@ -20,25 +21,23 @@ class Preferences(QtWidgets.QDialog):
 
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
-            ["rtdc/output_path", self.rtdc_output_path,
-             pathlib.Path.cwd()],
-            ["rtdc/tree_depth_limit", self.tree_depth_limit, 3],
+            ["main/output_path", self.lineEdit_output_path,
+             pathlib.Path.home()],
+            ["main/tree_depth_limit", self.spinBox_tree_depth_limit, 3],
         ]
         self.reload()
 
         # signals
-        self.btn_apply = self.buttonBox.button(
-            QtWidgets.QDialogButtonBox.StandardButton.Apply)
-        self.btn_apply.clicked.connect(self.on_settings_apply)
+        self.btn_ok = self.buttonBox.button(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok)
+        self.btn_ok.clicked.connect(self.on_settings_ok)
         self.btn_cancel = self.buttonBox.button(
             QtWidgets.QDialogButtonBox.StandardButton.Cancel)
         self.btn_restore = self.buttonBox.button(
             QtWidgets.QDialogButtonBox.StandardButton.RestoreDefaults)
         self.btn_restore.clicked.connect(self.on_settings_restore)
-        self.select_rtdc_output_path.clicked.connect(
+        self.pushButton_output_path.clicked.connect(
             self.on_task_select_output_dir)
-        # tab changed
-        self.tabWidget.currentChanged.connect(self.on_tab_changed)
 
     def reload(self):
         """Read configuration or set default parameters"""
@@ -54,41 +53,23 @@ class Preferences(QtWidgets.QDialog):
                 raise NotImplementedError("No rule for '{}'".format(key))
 
     @QtCore.pyqtSlot()
-    def on_settings_apply(self):
+    def on_settings_ok(self):
         """Save current changes made in UI to settings and reload UI"""
         for key, widget, default in self.config_pairs:
             if isinstance(widget, QtWidgets.QCheckBox):
                 value = int(widget.isChecked())
             elif isinstance(widget, QtWidgets.QLineEdit):
                 value = widget.text().strip()
-                if widget is self.rtdc_output_path:
-                    prev_value = self.settings.value(key)
-                    path = pathlib.Path(widget.text().strip())
-                    if path.exists():
-                        value = str(path)
-                    else:
-                        msg = QtWidgets.QMessageBox()
-                        msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-                        msg.setText("Given path does not exist! Please "
-                                    "check!\nPrevious setting will be"
-                                    " restored.")
-                        msg.setWindowTitle("Warning")
-                        msg.exec()
-                        if pathlib.Path(prev_value).exists():
-                            value = prev_value
-                        else:
-                            msg = QtWidgets.QMessageBox()
-                            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-                            msg.setText("Path from previous settings does not "
-                                        "exist either, original default output"
-                                        " path is restored.")
-                            msg.setWindowTitle("Warning")
-                            msg.exec()
-                            value = pathlib.Path.cwd()
+                if widget is self.lineEdit_output_path:
+                    if not pathlib.Path(value).exists():
+                        warnings.warn(f"Path {value} does not exist, "
+                                      f"defaulting to user home directory.")
+                        value = str(pathlib.Path.home())
             elif isinstance(widget, QtWidgets.QSpinBox):
                 value = int(widget.value())
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
+            print(key, value)
             self.settings.setValue(key, value)
 
         # reload UI to give visual feedback
@@ -100,19 +81,13 @@ class Preferences(QtWidgets.QDialog):
         self.reload()
 
     @QtCore.pyqtSlot()
-    def on_tab_changed(self):
-        self.btn_apply.setEnabled(True)
-        self.btn_cancel.setEnabled(True)
-        self.btn_restore.setEnabled(True)
-
-    @QtCore.pyqtSlot()
     def on_task_select_output_dir(self) -> None:
         p = QtWidgets.QFileDialog.getExistingDirectory(
             parent=self,
             caption="Select output directory:",
-            directory=self.rtdc_output_path.text())
+            directory=self.lineEdit_output_path.text())
         if p:
             if is_dir_writable(p):
-                self.rtdc_output_path.setText(str(p))
+                self.lineEdit_output_path.setText(str(p))
             else:
                 raise ValueError(f"Directory {p} is not writable!")

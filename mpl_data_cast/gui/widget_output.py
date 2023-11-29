@@ -11,14 +11,19 @@ class OutputWidget(QtWidgets.QWidget):
     Contains a lineEdit, a button, and a treeview widget."""
     def __init__(self, *args, **kwargs):
         super(OutputWidget, self).__init__(*args, **kwargs)
+        self.path = None
+        self.p_tree = None
 
         path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
                                                   "widget_output.ui")
-        uic.loadUi(path_ui, self)
+        self.settings = QtCore.QSettings()
+        self.tree_depth_limit = int(self.settings.value(
+            "main/tree_depth_limit", 3))
 
-        self.path = None
-        self.p_tree = None
-        self.tree_depth_limit = 3
+        uic.loadUi(path_ui, self)
+        self.update_output_dir(
+            str(self.settings.value("main/output_path",
+                                    pathlib.Path.home())))
 
         self.pushButton_output_dir.clicked.connect(
             self.on_task_select_output_dir)

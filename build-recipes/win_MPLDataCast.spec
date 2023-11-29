@@ -29,7 +29,7 @@ cli_exe = EXE(
       strip=False,
       upx=False,
       icon=NAME + ".ico",
-      console=bool(mpl_data_cast.__version__.count("post")),)
+      console=True)
 
 
 gui_a = Analysis(
@@ -60,7 +60,7 @@ gui_exe = EXE(
       strip=False,
       upx=False,
       icon=NAME + ".ico",
-      console=bool(mpl_data_cast.__version__.count("post")),)
+      console=bool(mpl_data_cast.__version__.count("post")))
 
 coll = COLLECT(
     cli_exe,
