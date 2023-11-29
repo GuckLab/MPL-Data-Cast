@@ -1,12 +1,13 @@
+from importlib import resources
 import time
 import signal
+import pathlib
 import sys
 import traceback
-import pathlib
+
 import dclab
 import h5py
 import numpy
-import pkg_resources
 from PyQt6 import uic, QtCore, QtWidgets
 
 from .. import recipe as mpldc_recipe
@@ -32,9 +33,9 @@ class MPLDataCast(QtWidgets.QMainWindow):
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
             sys.exit(0)
 
-        path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
-                                                  "main.ui")
-        uic.loadUi(path_ui, self)
+        ref_ui = resources.files("mpl_data_cast.gui") / "main.ui"
+        with resources.as_file(ref_ui) as path_ui:
+            uic.loadUi(path_ui, self)
 
         # settings
         self.settings = QtCore.QSettings()

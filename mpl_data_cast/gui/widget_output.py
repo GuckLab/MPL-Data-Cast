@@ -1,5 +1,5 @@
 from PyQt6 import QtWidgets, QtCore, uic
-import pkg_resources
+from importlib import resources
 import pathlib
 
 from ..path_tree import PathTree, list_items_in_tree
@@ -14,8 +14,10 @@ class OutputWidget(QtWidgets.QWidget):
         self.path = None
         self.p_tree = None
 
-        path_ui = pkg_resources.resource_filename("mpl_data_cast.gui",
-                                                  "widget_output.ui")
+        ref_ui = resources.files("mpl_data_cast.gui") / "widget_output.ui"
+        with resources.as_file(ref_ui) as path_ui:
+            uic.loadUi(path_ui, self)
+
         self.settings = QtCore.QSettings()
         self.tree_depth_limit = int(self.settings.value(
             "main/tree_depth_limit", 3))
