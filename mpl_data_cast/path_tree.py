@@ -39,6 +39,7 @@ class PathTree:
                             "what to do.")
         self.depth_limit = depth_limit
         self.children = {}
+        self.list_child_dirs = []
 
         tree_iterator = self.tree_root.iterdir()
         while True:
@@ -53,14 +54,11 @@ class PathTree:
                 if file_obj.is_dir() and self.depth_limit > 1:
                     self.children[file_obj.name] = \
                         PathTree(file_obj, self.depth_limit - 1)
-        self.list_child_dirs = []
-        if self.depth_limit == 1:
-            # in case we are in the "deepest" PathTree, only make a list of
-            # subdirectories, but not full PathTree objects. This will make
-            # sure that the function `get_tree_depth` will always return
-            # correct values
-            for file_obj in self.tree_root.iterdir():
-                if file_obj.is_dir():
+                elif file_obj.is_dir() and self.depth_limit == 1:
+                    # in case we are in the "deepest" PathTree, only make
+                    # a list of subdirectories, but not full PathTree objects.
+                    # This will make sure that the function `get_tree_depth`
+                    # will always return correct values.
                     self.list_child_dirs.append(file_obj.name)
         self.tree_depth = self.get_tree_depth()
 
