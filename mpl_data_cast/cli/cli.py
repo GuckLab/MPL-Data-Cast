@@ -20,7 +20,7 @@ def list_recipes():
     for rec in recipes:
         cls = mpldc_recipe.map_recipe_name_to_class(rec)
         col1 = rec + (" " * (col1len - len(rec)))
-        doc = cls.__doc__.split("\n")[0]
+        doc = cls.__doc__.strip().split("\n")[0]
         click.secho(f"{col1} {doc}")
 
 

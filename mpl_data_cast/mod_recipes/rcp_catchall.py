@@ -6,7 +6,7 @@ from ..recipe import Recipe
 
 
 class CatchAllRecipe(Recipe):
-    """Copy all files, except known junk files"""
+    """Just copy all files, except known junk files"""
 
     def convert_dataset(self, path_list, temp_path, **kwargs):
         """Create a symlink and if that fails, copy the file"""

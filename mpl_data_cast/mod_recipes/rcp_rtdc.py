@@ -6,7 +6,10 @@ from ..recipe import Recipe
 
 
 class RTDCRecipe(Recipe):
-    """Compress RT-DC data and append SoftwareSettings.ini to logs"""
+    __doc__ = f"""
+    Compress DC data and include .ini files (dclab {dclab.__version__})
+    """
+
     def convert_dataset(self, path_list, temp_path, **kwargs):
         """Compress the dataset using dclab and append SoftwareSettings.ini"""
         # first compress the .rtdc file
@@ -27,7 +30,7 @@ class RTDCRecipe(Recipe):
             # search for matching SoftwareSettings.ini files
             if pp.name.startswith("M"):
                 pini = pp.with_name(
-                    pp.name.split("_")[0]+"_SoftwareSettings.ini")
+                    pp.name.split("_")[0] + "_SoftwareSettings.ini")
                 if pini.exists():
                     path_list.append(pini)
             yield path_list
