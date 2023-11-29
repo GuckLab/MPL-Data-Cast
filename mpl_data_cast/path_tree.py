@@ -40,10 +40,19 @@ class PathTree:
         self.depth_limit = depth_limit
         self.children = {}
 
-        for file_obj in self.tree_root.iterdir():
-            if file_obj.is_dir() and self.depth_limit > 1:
-                self.children[file_obj.name] = PathTree(file_obj,
-                                                        self.depth_limit - 1)
+        tree_iterator = self.tree_root.iterdir()
+        while True:
+            try:
+                file_obj = next(tree_iterator)
+            except StopIteration:
+                break
+            except PermissionError:
+                # Windows might encounter this.
+                pass
+            else:
+                if file_obj.is_dir() and self.depth_limit > 1:
+                    self.children[file_obj.name] = \
+                        PathTree(file_obj, self.depth_limit - 1)
         self.list_child_dirs = []
         if self.depth_limit == 1:
             # in case we are in the "deepest" PathTree, only make a list of
