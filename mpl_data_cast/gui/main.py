@@ -88,9 +88,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
             "main/tree_depth_limit", 8))
         self.widget_input.tree_depth_limit = int(self.settings.value(
             "main/tree_depth_limit", 8))
-        # update output dir
-        self.widget_output.update_output_dir(self.settings.value(
-            "main/output_path"))
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:

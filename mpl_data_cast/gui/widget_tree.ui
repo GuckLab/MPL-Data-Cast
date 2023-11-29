@@ -18,7 +18,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="groupBox">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -26,7 +26,7 @@
       <bool>true</bool>
      </property>
      <property name="title">
-      <string>Output</string>
+      <string>Input/Output</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="leftMargin">
@@ -58,7 +58,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLineEdit" name="lineEdit_output">
+           <widget class="QLineEdit" name="lineEdit_dir">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -71,7 +71,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_output_dir">
+           <widget class="QPushButton" name="pushButton_dir">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -85,14 +85,14 @@
              </size>
             </property>
             <property name="text">
-             <string>Select target directory</string>
+             <string>Select input/target directory</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QTreeWidget" name="treeWidget_output">
+         <widget class="QTreeWidget" name="treeWidget">
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -101,6 +101,9 @@
           </property>
           <property name="sizeAdjustPolicy">
            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
           </property>
           <property name="dragDropMode">
            <enum>QAbstractItemView::NoDragDrop</enum>
@@ -122,9 +125,6 @@
           </property>
           <property name="uniformRowHeights">
            <bool>true</bool>
-          </property>
-          <property name="animated">
-           <bool>false</bool>
           </property>
           <property name="columnCount">
            <number>1</number>
