@@ -66,7 +66,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QTreeWidget" name="treeWidget">
+       <widget class="QTreeView" name="treeView">
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
@@ -94,32 +94,18 @@
         <property name="textElideMode">
          <enum>Qt::ElideRight</enum>
         </property>
-        <property name="indentation">
-         <number>5</number>
-        </property>
         <property name="uniformRowHeights">
          <bool>true</bool>
         </property>
-        <property name="columnCount">
-         <number>1</number>
-        </property>
-        <property name="topLevelItemCount" stdset="0">
-         <number>0</number>
-        </property>
-        <attribute name="headerVisible">
+        <property name="sortingEnabled">
          <bool>true</bool>
-        </attribute>
-        <attribute name="headerCascadingSectionResizes">
-         <bool>false</bool>
-        </attribute>
+        </property>
+        <property name="animated">
+         <bool>true</bool>
+        </property>
         <attribute name="headerDefaultSectionSize">
-         <number>125</number>
+         <number>200</number>
         </attribute>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
        </widget>
       </item>
       <item>

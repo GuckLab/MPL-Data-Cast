@@ -88,8 +88,8 @@ class MPLDataCast(QtWidgets.QMainWindow):
             "main/tree_depth_limit", 8))
         self.widget_input.tree_depth_limit = int(self.settings.value(
             "main/tree_depth_limit", 8))
-        self.widget_output.update_tree_dir(self.settings.value(
-            "main/output_path", pathlib.Path.home()))
+        self.widget_output.path = self.settings.value("main/output_path",
+                                                      pathlib.Path.home())
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
@@ -154,7 +154,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
             self.progressBar.setValue(0)
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
-            self.widget_output.update_tree()
         else:
             msg = "Some problems occured during data transfer:\n"
             for path, _ in result["errors"]:
@@ -171,7 +170,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
     def on_recipe_changed(self):
         # Update the recipe description
         rec_cls = self.current_recipe
-        doc = rec_cls.__doc__.split("\n")[0]
+        doc = rec_cls.__doc__.strip().split("\n")[0]
         self.label_recipe_descr.setText(f"*{doc}*")
         self.widget_input.recipe = rec_cls
         self.widget_output.recipe = rec_cls

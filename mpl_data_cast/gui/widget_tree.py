@@ -4,9 +4,8 @@ import time
 import threading
 from typing import Literal
 
-from PyQt6 import QtWidgets, QtCore, uic
+from PyQt6 import QtWidgets, QtCore, QtGui, uic
 
-from ..path_tree import PathTree, list_items_in_tree
 from ..recipe import map_recipe_name_to_class
 from ..util import is_dir_writable
 
@@ -22,6 +21,7 @@ class TreeObjectCounter(threading.Thread):
         self.size_objects = 0
         self.must_break = False
         self.is_counting = False
+        self.has_counted = False
 
     def run(self):
         recipe = self.recipe
@@ -41,14 +41,16 @@ class TreeObjectCounter(threading.Thread):
                 # reset
                 self.num_objects = 0
                 self.size_objects = 0
+                self.has_counted = False
                 recipe = self.recipe
                 path = self.path
-            elif self.num_objects:
+            elif self.num_objects or self.has_counted:
                 # already counted
                 pass
             else:
                 # start crawling the directory tree
                 self.is_counting = True
+                self.has_counted = False
                 try:
                     rcp = recipe(path, path)
                 except BaseException:
@@ -76,6 +78,7 @@ class TreeObjectCounter(threading.Thread):
                             except BaseException:
                                 pass
                 self.is_counting = False
+                self.has_counted = True
             time.sleep(0.5)
 
 
@@ -105,6 +108,11 @@ class TreeWidget(QtWidgets.QWidget):
         self.tree_counter = TreeObjectCounter()
         self.tree_counter.start()
 
+        # tree view model
+        self.model = QtGui.QFileSystemModel()
+        self.model.setReadOnly(True)
+        self.treeView.setModel(self.model)
+
         # UI update function
         self.tree_label_timer = QtCore.QTimer(self)
         self.tree_label_timer.timeout.connect(self.on_update_object_count)
@@ -115,12 +123,11 @@ class TreeWidget(QtWidgets.QWidget):
         self.settings = QtCore.QSettings()
         self.tree_depth_limit = int(self.settings.value(
             "main/tree_depth_limit", 3))
-        self.update_tree_dir(str(pathlib.Path.home()))
 
         self.pushButton_dir.clicked.connect(
-            self.on_task_select_tree_dir)
+            self.on_tree_browse_button)
         self.lineEdit_dir.editingFinished.connect(
-            self.update_tree_dir_from_lineedit)
+            self.on_tree_edit_line)
 
     @property
     def path(self):
@@ -128,8 +135,21 @@ class TreeWidget(QtWidgets.QWidget):
 
     @path.setter
     def path(self, path):
-        self._path = path
-        self.tree_counter.path = path
+        path = pathlib.Path(path)
+        if not self.readonly and not is_dir_writable(path):
+            msg_txt = f"The {self.which} directory '{path}' is not " \
+                      f"writable. Please select a different directory."
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            msg.setText(msg_txt)
+            msg.setWindowTitle(f"{self.which.capitalize()} directory invalid")
+            msg.exec()
+        else:
+            self._path = path
+            self.tree_counter.path = path
+            self.model.setRootPath(str(path))
+            self.treeView.setRootIndex(self.model.index(str(path)))
+            self.lineEdit_dir.setText(str(path))
 
     @property
     def recipe(self):
@@ -140,26 +160,6 @@ class TreeWidget(QtWidgets.QWidget):
     def recipe(self, recipe):
         self._recipe = recipe
         self.tree_counter.recipe = recipe
-
-    @QtCore.pyqtSlot()
-    def on_task_select_tree_dir(self) -> None:
-        p = QtWidgets.QFileDialog.getExistingDirectory(
-            parent=self,
-            caption=f"Select {self.which} directory:",
-            directory=str(self.path) if self.path else None)
-        if p:
-            self.update_tree_dir(p)
-
-    @QtCore.pyqtSlot()
-    def on_update_object_count(self):
-        objects = self.tree_counter.num_objects
-        size = self.tree_counter.size_objects
-        size_str = human_size(size)
-        if self.tree_counter.is_counting:
-            label = f"counting {objects} objects ({size_str})"
-        else:
-            label = f"{objects} objects ({size_str})"
-        self.label_objects.setText(label)
 
     @QtCore.pyqtSlot(object)
     def dragEnterEvent(self, e) -> None:
@@ -179,58 +179,35 @@ class TreeWidget(QtWidgets.QWidget):
             path_tree = pp
         else:
             path_tree = pp.parent
-        self.update_tree_dir(path_tree)
+        self.path = path_tree
 
     @QtCore.pyqtSlot()
-    def update_tree_dir_from_lineedit(self) -> None:
-        """Executed when the tree path was manually edited by the user."""
-        tree_dir = self.lineEdit_dir.text()
-        if tree_dir:
-            self.update_tree_dir(tree_dir)
+    def on_tree_browse_button(self) -> None:
+        p = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self,
+            caption=f"Select {self.which} directory:",
+            directory=str(self.path) if self.path else None)
+        if p:
+            self.path = p
 
     @QtCore.pyqtSlot()
-    def update_object_count(self) -> None:
-        """Update `self.label_objects` with the counted events"""
-
-    @QtCore.pyqtSlot()
-    def update_tree_dir(self, tree_dir: str | pathlib.Path) -> None:
-        """Checks if the tree directory as given by the user exists and
-        updates the lineEdit widget accordingly.
-
-        Parameter
-        ---------
-        tree_dir: str or pathlib.Path
-            The directory for the tree.
-        """
-        if not self.readonly and not is_dir_writable(tree_dir):
-            msg_txt = f"The {self.which} directory '{tree_dir}' is not " \
-                      f"writable. Please select a different directory."
-            msg = QtWidgets.QMessageBox(self)
-            msg.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-            msg.setText(msg_txt)
-            msg.setWindowTitle(f"{self.which.capitalize()} directory invalid")
-            msg.exec()
-        else:
-            tree_dir = pathlib.Path(tree_dir)
+    def on_tree_edit_line(self) -> None:
+        """User edited the lineEdit manually"""
+        tree_dir = pathlib.Path(self.lineEdit_dir.text())
+        if tree_dir.is_dir():
             self.path = tree_dir
-            self.lineEdit_dir.setText(str(tree_dir))
-            self.update_tree()
 
     @QtCore.pyqtSlot()
-    def update_tree(self) -> None:
-        """Update the `PathTree` object based on the current root path in
-        `self.path` and update the GUI to show the new tree."""
-        self.p_tree = PathTree(self.path, self.tree_depth_limit)
-        self.treeWidget.clear()
-        self.treeWidget.setColumnCount(self.p_tree.tree_depth + 1)
-
-        list_items_in_tree(self.p_tree,
-                           self.treeWidget,
-                           h_level=0,
-                           depth_limit=self.tree_depth_limit)
-
-        QtWidgets.QApplication.processEvents(
-            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+    def on_update_object_count(self):
+        """`self.tree_label_timer` calls this regularly"""
+        objects = self.tree_counter.num_objects
+        size = self.tree_counter.size_objects
+        size_str = human_size(size)
+        if self.tree_counter.is_counting:
+            label = f"counting {objects} objects ({size_str})"
+        else:
+            label = f"{objects} objects ({size_str})"
+        self.label_objects.setText(label)
 
 
 def human_size(bt, units=None):

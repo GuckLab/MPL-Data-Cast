@@ -7,7 +7,7 @@ from ..recipe import Recipe
 
 class RTDCRecipe(Recipe):
     __doc__ = f"""
-    Compress DC data and include .ini files (dclab {dclab.__version__})
+    Compress raw DC data and include .ini files (dclab {dclab.__version__})
     """
 
     def convert_dataset(self, path_list, temp_path, **kwargs):

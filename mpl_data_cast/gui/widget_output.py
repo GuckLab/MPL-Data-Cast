@@ -9,5 +9,5 @@ class OutputWidget(TreeWidget):
     def __init__(self, *args, **kwargs):
         super(OutputWidget, self).__init__(which="output", *args, **kwargs)
 
-        self.update_tree_dir(
-            str(self.settings.value("main/output_path", pathlib.Path.home())))
+        self.path = self.settings.value("main/output_path",
+                                        pathlib.Path.home())
