@@ -4,6 +4,7 @@
  - enh: handle PermissionError when building directory tree
  - enh: identify existing target paths based on size quicker
  - enh: correct progress display and remove unused code
+ - enh: display object count and size in tree views
  - ref: migrate from pkg_resources to importlib.resources
  - ref: unify input and output tree widget with one base class
 0.5.2

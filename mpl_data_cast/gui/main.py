@@ -173,6 +173,8 @@ class MPLDataCast(QtWidgets.QMainWindow):
         rec_cls = self.current_recipe
         doc = rec_cls.__doc__.split("\n")[0]
         self.label_recipe_descr.setText(f"*{doc}*")
+        self.widget_input.recipe = rec_cls
+        self.widget_output.recipe = rec_cls
 
 
 class Callback:
