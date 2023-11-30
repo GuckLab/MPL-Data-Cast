@@ -66,6 +66,7 @@ class Recipe(ABC):
         errors = []
         # TODO: use more efficient tree structure to keep track of known files
         known_files = []
+
         # Copy the raw data specified by the recipe
         ds_iterator = self.get_raw_data_iterator()
         for path_list in ds_iterator:
@@ -87,6 +88,7 @@ class Recipe(ABC):
                                               )
             if not ok:
                 raise ValueError(f"Transfer to {targ_path} failed!")
+
         # Walk the directory tree and copy any other files
         ignored = IGNORED_FILE_NAMES + self.ignored_file_names
         for pp in self.path_raw.rglob("*"):

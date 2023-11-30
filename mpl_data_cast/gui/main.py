@@ -207,10 +207,11 @@ class CastingCallback:
         pass
 
     def __call__(self, path) -> None:
-        # Let the user know how far we are
+        # Let the user know where we are
         self.gui.label_file.setText(f"Processing {path}...")
 
         if self.tree_counter.has_counted:
+            # Let the user know how far we are
             self.gui.progressBar.setRange(0, 100)
             self.gui.progressBar.setValue(
                 int(self.counter / self.tree_counter.num_objects * 100))
