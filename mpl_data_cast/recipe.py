@@ -54,7 +54,7 @@ class Recipe(ABC):
         Parameters
         ----------
         path_callback: Callable
-            Callable function accepting a path; used for tracking
+            Callable function accepting a list of paths; used for tracking
             the progress (e.g. via the CLI)
 
         Returns
@@ -72,7 +72,7 @@ class Recipe(ABC):
         for path_list in ds_iterator:
             known_files += path_list
             if path_callback is not None:
-                path_callback(path_list[0])
+                path_callback(path_list)
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
             try:
@@ -98,7 +98,7 @@ class Recipe(ABC):
                 continue
             else:
                 if path_callback is not None:
-                    path_callback(pp)
+                    path_callback([pp])
                 prel = pp.relative_to(self.path_raw)
                 target_path = self.path_tar / prel
                 target_path.parent.mkdir(parents=True, exist_ok=True)

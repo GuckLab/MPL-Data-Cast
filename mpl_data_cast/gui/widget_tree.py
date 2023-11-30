@@ -6,7 +6,7 @@ from typing import Literal
 
 from PyQt6 import QtWidgets, QtCore, QtGui, uic
 
-from ..recipe import map_recipe_name_to_class
+from ..recipe import IGNORED_FILE_NAMES, map_recipe_name_to_class
 from ..util import is_dir_writable
 
 
@@ -61,40 +61,37 @@ class TreeObjectCounter(threading.Thread):
                 # start crawling the directory tree
                 self.is_counting = True
                 self.has_counted = False
-                try:
-                    rcp = recipe(path, path)
-                except BaseException:
-                    pass
-                else:
-                    tree_iterator = rcp.get_raw_data_iterator()
-                    while True:
-                        # check whether we have to abort
-                        if (self.must_break
-                                or recipe != self.recipe or path != self.path):
-                            self.num_objects = 0
-                            self.size_objects = 0
-                            break
-                        try:
-                            item = next(tree_iterator)
-                        except StopIteration:
-                            self.has_counted = True
-                            break
-                        except BaseException:
-                            # Windows might encounter PermissionError.
-                            pass
-                        else:
-                            with self.lock:
-                                # check before incrementing
-                                if self.abort_current_count:
-                                    self.abort_current_count = False
-                                    break
-                                self.num_objects += 1
-                                try:
-                                    self.size_objects += sum(
-                                        [it.stat().st_size for it in item])
-                                except BaseException:
-                                    pass
-                    self.is_counting = False
+                ignored_files = IGNORED_FILE_NAMES + recipe.ignored_file_names
+                tree_iterator = path.rglob("*")
+                while True:
+                    # check whether we have to abort
+                    if (self.must_break
+                            or recipe != self.recipe or path != self.path):
+                        self.num_objects = 0
+                        self.size_objects = 0
+                        break
+                    try:
+                        pp = next(tree_iterator)
+                    except StopIteration:
+                        self.has_counted = True
+                        break
+                    except BaseException:
+                        # Windows might encounter PermissionError.
+                        pass
+                    else:
+                        if pp.is_dir() or pp.name in ignored_files:
+                            continue
+                        with self.lock:
+                            # check before incrementing
+                            if self.abort_current_count:
+                                self.abort_current_count = False
+                                break
+                            self.num_objects += 1
+                            try:
+                                self.size_objects += pp.stat().st_size
+                            except BaseException:
+                                pass
+                self.is_counting = False
             time.sleep(0.5)
 
 

@@ -185,6 +185,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
             for path, tb in result["errors"]:
                 text += f"PATH {path}:\n{tb}\n\n"
             pathlib.Path("mpldc-dump.txt").write_text(text)
+        self.label_file.setText("")
         self.pushButton_transfer.setEnabled(True)
 
 
@@ -206,7 +207,8 @@ class CastingCallback:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def __call__(self, path) -> None:
+    def __call__(self, path_list) -> None:
+        path = path_list[0]
         # Let the user know where we are
         self.gui.label_file.setText(f"Processing {path}...")
 
@@ -219,7 +221,7 @@ class CastingCallback:
             # go to undetermined state
             self.gui.progressBar.setRange(0, 0)
 
-        self.counter += 1
+        self.counter += len(path_list)
 
 
 class CastingThread(threading.Thread):

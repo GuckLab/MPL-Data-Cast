@@ -1,6 +1,7 @@
 import inspect
 import pathlib
 import time
+from typing import List
 
 import click
 
@@ -105,14 +106,14 @@ class CLICallback:
         self.print(f"Processed {self.counter} files (~{rate:.1f} MB/s).")
         print("")
 
-    def __call__(self, path: pathlib.Path) -> None:
+    def __call__(self, path_list: List[pathlib.Path]) -> None:
         self.counter += 1
-        name = click.format_filename(path, shorten=True)
+        name = click.format_filename(path_list[0], shorten=True)
         message = f"Processing file {self.counter}: {name}"
         rate = self.get_rate()
         if rate:
             message += f" ({rate:.1f}MB/s)"
-        self.size += path.stat().st_size
+        self.size += sum([pp.stat().st_size for pp in path_list])
         self.print(message)
 
     def get_rate(self) -> float:
