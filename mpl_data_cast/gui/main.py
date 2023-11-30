@@ -3,7 +3,9 @@ import time
 import signal
 import pathlib
 import sys
+import threading
 import traceback
+from typing import Dict
 
 import dclab
 import h5py
@@ -151,10 +153,20 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                  self.widget_output.path)
 
         tree_counter = self.widget_input.tree_counter
-        with Callback(self, tree_counter) as path_callback:
+        with CastingCallback(self, tree_counter) as callback:
+            # run the casting operation in a separate thread
+            caster = CastingThread(rp, callback=callback)
+            caster.start()
 
-            result = rp.cast(path_callback=path_callback)
-            self.widget_output.trigger_recount_objects()
+        while not caster.result:
+            QtWidgets.QApplication.processEvents(
+                QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+            time.sleep(.1)
+
+        caster.join()
+        result = caster.result
+
+        self.widget_output.trigger_recount_objects()
 
         if result["success"]:
             self.progressBar.setValue(100)
@@ -177,7 +189,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.pushButton_transfer.setEnabled(True)
 
 
-class Callback:
+class CastingCallback:
     """Makes it possible to execute code everytime a file was processed.
     Used for updating the progress bar and calculating the processing rate."""
 
@@ -208,9 +220,18 @@ class Callback:
             # go to undetermined state
             self.gui.progressBar.setRange(0, 0)
 
-        QtWidgets.QApplication.processEvents(
-            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
         self.counter += 1
+
+
+class CastingThread(threading.Thread):
+    def __init__(self, rp, callback, *args, **kwargs):
+        super(CastingThread, self).__init__(*args, **kwargs)
+        self.rp = rp
+        self.callback = callback
+        self.result = {}
+
+    def run(self):
+        self.result = self.rp.cast(callback=self.callback)
 
 
 def excepthook(etype, value, trace) -> None:

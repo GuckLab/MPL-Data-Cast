@@ -1,5 +1,6 @@
 0.6.0
  - feat: generalize GUI to use all recipes
+ - enh: prevent GUI from locking when transferring large file
  - enh: re-use tree count information for transfer progress bar
  - enh: display the actual directory tree instead of a table
  - enh: compute file hash while copying, avoiding reading data twice
