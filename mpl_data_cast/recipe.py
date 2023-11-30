@@ -75,7 +75,8 @@ class Recipe(ABC):
             targ_path = self.get_target_path(path_list)
             temp_path = self.get_temp_path(path_list)
             try:
-                self.convert_dataset(path_list=path_list, temp_path=temp_path,
+                self.convert_dataset(path_list=path_list,
+                                     temp_path=temp_path,
                                      **kwargs)
             except BaseException:
                 errors.append((path_list[0], traceback.format_exc()))
@@ -223,9 +224,9 @@ class Recipe(ABC):
                 hash_input = copyhashfile(temp_path, target_path)
             else:
                 shutil.copy2(temp_path, target_path)
-            # compute md5hash of target path
+            # compute md5 hash of target path
             hash_cp = hashfile(target_path)
-            # compare md5hashes (verification)
+            # compare md5 hashes (verification)
             success = hash_input == hash_cp
             if not success:
                 # Since we copied the wrong file, we are responsible for

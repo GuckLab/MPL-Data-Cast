@@ -5,7 +5,6 @@ import pathlib
 import sys
 import threading
 import traceback
-from typing import Dict
 
 import dclab
 import h5py
@@ -153,9 +152,9 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                  self.widget_output.path)
 
         tree_counter = self.widget_input.tree_counter
-        with CastingCallback(self, tree_counter) as callback:
+        with CastingCallback(self, tree_counter) as path_callback:
             # run the casting operation in a separate thread
-            caster = CastingThread(rp, callback=callback)
+            caster = CastingThread(rp, path_callback=path_callback)
             caster.start()
 
         while not caster.result:
@@ -198,10 +197,8 @@ class CastingCallback:
                  tree_counter: widget_tree.TreeObjectCounter):
         self.gui = gui
         self.counter = 0
-        #: This is a thread running in the background, counting all files.
+        #: This is a thread running in the background, counting recipe files.
         self.tree_counter = tree_counter
-        self.size = 0
-        self.time_start = time.monotonic()
 
     def __enter__(self):
         return self
@@ -210,7 +207,8 @@ class CastingCallback:
         pass
 
     def __call__(self, path) -> None:
-        self.size += path.stat().st_size
+        # Let the user know how far we are
+        self.gui.label_file.setText(f"Processing {path}...")
 
         if self.tree_counter.has_counted:
             self.gui.progressBar.setRange(0, 100)
@@ -224,14 +222,14 @@ class CastingCallback:
 
 
 class CastingThread(threading.Thread):
-    def __init__(self, rp, callback, *args, **kwargs):
+    def __init__(self, rp, path_callback, *args, **kwargs):
         super(CastingThread, self).__init__(*args, **kwargs)
         self.rp = rp
-        self.callback = callback
+        self.path_callback = path_callback
         self.result = {}
 
     def run(self):
-        self.result = self.rp.cast(callback=self.callback)
+        self.result = self.rp.cast(path_callback=self.path_callback)
 
 
 def excepthook(etype, value, trace) -> None:
@@ -263,19 +261,6 @@ def excepthook(etype, value, trace) -> None:
         cb = QtWidgets.QApplication.clipboard()
         cb.clear(mode=cb.Mode.Clipboard)
         cb.setText(exception)
-
-
-def error(message: str, info: str = "", details: str = "") -> None:
-    """Shows a little window for error messages."""
-    msg = QtWidgets.QMessageBox()
-    msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
-    msg.setWindowTitle("Errors occured")
-    msg.setText(message)
-    if info:
-        msg.setInformativeText(info)
-    if details:
-        msg.setDetailedText(details)
-    msg.exec()
 
 
 # Make Ctr+C close the app
