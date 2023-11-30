@@ -1,19 +1,17 @@
 def main():
-    import os
-    import pkg_resources
+    from importlib import resources
     import sys
+    from PyQt6 import QtWidgets, QtCore, QtGui
 
-    from PyQt6.QtWidgets import QApplication
+    from .main import MPLDataCast
 
-    app = QApplication(sys.argv)
-    imdir = pkg_resources.resource_filename("mpl_data_cast", "img")
+    app = QtWidgets.QApplication(sys.argv)
+    ref_ico = resources.files("mpl_data_cast.gui.img") / "mpldc_icon.png"
+    with resources.as_file(ref_ico) as path_icon:
+        app.setWindowIcon(QtGui.QIcon(str(path_icon)))
 
-    from PyQt6 import QtGui
-    from mpl_data_cast.gui import MPLDataCast
-
-    # Set Application Icon
-    icon_path = os.path.join(imdir, "mpldc_icon.png")
-    app.setWindowIcon(QtGui.QIcon(icon_path))
+    # Use dots as decimal separators
+    QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.c()))
 
     window = MPLDataCast()  # noqa: F841
 

@@ -1,5 +1,5 @@
+from importlib import resources
 import pathlib
-import pkg_resources
 import warnings
 
 from PyQt6 import uic, QtCore, QtWidgets
@@ -13,9 +13,11 @@ class Preferences(QtWidgets.QDialog):
 
     def __init__(self, parent, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent=parent, *args, **kwargs)
-        path_ui = pkg_resources.resource_filename(
-            "mpl_data_cast.gui", "preferences.ui")
-        uic.loadUi(path_ui, self)
+
+        ref_ui = resources.files("mpl_data_cast.gui") / "preferences.ui"
+        with resources.as_file(ref_ui) as path_ui:
+            uic.loadUi(path_ui, self)
+
         self.settings = QtCore.QSettings()
         self.parent = parent
 
@@ -23,7 +25,6 @@ class Preferences(QtWidgets.QDialog):
         self.config_pairs = [
             ["main/output_path", self.lineEdit_output_path,
              pathlib.Path.home()],
-            ["main/tree_depth_limit", self.spinBox_tree_depth_limit, 3],
         ]
         self.reload()
 

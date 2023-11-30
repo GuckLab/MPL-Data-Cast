@@ -83,11 +83,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         dlg = preferences.Preferences(self)
         dlg.setWindowTitle("MPL-Data-Cast Preferences")
         dlg.exec()
-        # update maximum tree depth
-        self.widget_output.tree_depth_limit = int(self.settings.value(
-            "main/tree_depth_limit", 8))
-        self.widget_input.tree_depth_limit = int(self.settings.value(
-            "main/tree_depth_limit", 8))
+        # set default output path
         self.widget_output.path = self.settings.value("main/output_path",
                                                       pathlib.Path.home())
 
@@ -147,6 +143,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
                 nb_files += 1
         with Callback(self, nb_files) as path_callback:
             result = rp.cast(path_callback=path_callback)
+            self.widget_output.trigger_recount_objects()
         if result["success"]:
             self.progressBar.setValue(100)
             QtWidgets.QMessageBox.information(self, "Transfer completed",

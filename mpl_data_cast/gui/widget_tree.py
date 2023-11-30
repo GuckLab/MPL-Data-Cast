@@ -20,8 +20,18 @@ class TreeObjectCounter(threading.Thread):
         self.num_objects = 0
         self.size_objects = 0
         self.must_break = False
+        self.abort_current_count = False
         self.is_counting = False
         self.has_counted = False
+        self.lock = threading.Lock()
+
+    def reset(self):
+        with self.lock:
+            self.abort_current_count = True
+            self.num_objects = 0
+            self.size_objects = 0
+            self.has_counted = False
+            self.is_counting = False
 
     def run(self):
         recipe = self.recipe
@@ -62,23 +72,29 @@ class TreeObjectCounter(threading.Thread):
                         if (self.must_break
                                 or recipe != self.recipe or path != self.path):
                             self.num_objects = 0
+                            self.size_objects = 0
                             break
                         try:
                             item = next(tree_iterator)
                         except StopIteration:
+                            self.has_counted = True
                             break
                         except BaseException:
                             # Windows might encounter PermissionError.
                             pass
                         else:
-                            self.num_objects += 1
-                            try:
-                                self.size_objects += sum(
-                                    [it.stat().st_size for it in item])
-                            except BaseException:
-                                pass
-                self.is_counting = False
-                self.has_counted = True
+                            with self.lock:
+                                # check before incrementing
+                                if self.abort_current_count:
+                                    self.abort_current_count = False
+                                    break
+                                self.num_objects += 1
+                                try:
+                                    self.size_objects += sum(
+                                        [it.stat().st_size for it in item])
+                                except BaseException:
+                                    pass
+                    self.is_counting = False
             time.sleep(0.5)
 
 
@@ -121,8 +137,6 @@ class TreeWidget(QtWidgets.QWidget):
         self.groupBox.setTitle(self.which.capitalize())
         self.pushButton_dir.setText(f"Select {self.which} directory")
         self.settings = QtCore.QSettings()
-        self.tree_depth_limit = int(self.settings.value(
-            "main/tree_depth_limit", 3))
 
         self.pushButton_dir.clicked.connect(
             self.on_tree_browse_button)
@@ -208,6 +222,10 @@ class TreeWidget(QtWidgets.QWidget):
         else:
             label = f"{objects} objects ({size_str})"
         self.label_objects.setText(label)
+
+    @QtCore.pyqtSlot()
+    def trigger_recount_objects(self):
+        self.tree_counter.reset()
 
 
 def human_size(bt, units=None):
