@@ -15,6 +15,7 @@ from .._version import version
 
 from . import preferences
 from . import splash
+from . import widget_tree
 
 
 class MPLDataCast(QtWidgets.QMainWindow):
@@ -124,26 +125,37 @@ class MPLDataCast(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Software", sw_text)
 
     @QtCore.pyqtSlot()
+    def on_recipe_changed(self):
+        # Update the recipe description
+        rec_cls = self.current_recipe
+        doc = rec_cls.__doc__.strip().split("\n")[0]
+        self.label_recipe_descr.setText(f"*{doc}*")
+        self.widget_input.recipe = rec_cls
+        self.widget_output.recipe = rec_cls
+
+    @QtCore.pyqtSlot()
     def on_task_transfer(self) -> None:
         """Execute recipe to transfer data."""
+        # sanity checks
         if not self.widget_input.path.exists():
-            QtWidgets.QMessageBox.information(self, "Error",
-                                              "Input directory not correct!")
+            QtWidgets.QMessageBox.error(self,
+                                        "Input directory error",
+                                        "Input directory does not exist!")
         if not self.widget_output.path.exists():
-            QtWidgets.QMessageBox.information(self, "Error",
-                                              "Output directory not correct!")
+            QtWidgets.QMessageBox.error(self,
+                                        "Output directory error",
+                                        "Output directory does not exist!")
 
+        self.pushButton_transfer.setEnabled(False)
         rp = self.current_recipe(self.widget_input.path,
                                  self.widget_output.path)
 
-        nb_files = 0  # counter for files, used for progress bar
-        for elem in self.widget_input.path.rglob("*"):
-            if (elem.is_file()
-                    and elem.name not in mpldc_recipe.IGNORED_FILE_NAMES):
-                nb_files += 1
-        with Callback(self, nb_files) as path_callback:
+        tree_counter = self.widget_input.tree_counter
+        with Callback(self, tree_counter) as path_callback:
+
             result = rp.cast(path_callback=path_callback)
             self.widget_output.trigger_recount_objects()
+
         if result["success"]:
             self.progressBar.setValue(100)
             QtWidgets.QMessageBox.information(self, "Transfer completed",
@@ -162,25 +174,20 @@ class MPLDataCast(QtWidgets.QMainWindow):
             for path, tb in result["errors"]:
                 text += f"PATH {path}:\n{tb}\n\n"
             pathlib.Path("mpldc-dump.txt").write_text(text)
-
-    @QtCore.pyqtSlot()
-    def on_recipe_changed(self):
-        # Update the recipe description
-        rec_cls = self.current_recipe
-        doc = rec_cls.__doc__.strip().split("\n")[0]
-        self.label_recipe_descr.setText(f"*{doc}*")
-        self.widget_input.recipe = rec_cls
-        self.widget_output.recipe = rec_cls
+        self.pushButton_transfer.setEnabled(True)
 
 
 class Callback:
     """Makes it possible to execute code everytime a file was processed.
     Used for updating the progress bar and calculating the processing rate."""
 
-    def __init__(self, gui, max_count: int):
+    def __init__(self,
+                 gui: MPLDataCast,
+                 tree_counter: widget_tree.TreeObjectCounter):
         self.gui = gui
         self.counter = 0
-        self.max_count = max_count
+        #: This is a thread running in the background, counting all files.
+        self.tree_counter = tree_counter
         self.size = 0
         self.time_start = time.monotonic()
 
@@ -192,7 +199,15 @@ class Callback:
 
     def __call__(self, path) -> None:
         self.size += path.stat().st_size
-        self.gui.progressBar.setValue(int(self.counter / self.max_count * 100))
+
+        if self.tree_counter.has_counted:
+            self.gui.progressBar.setRange(0, 100)
+            self.gui.progressBar.setValue(
+                int(self.counter / self.tree_counter.num_objects * 100))
+        else:
+            # go to undetermined state
+            self.gui.progressBar.setRange(0, 0)
+
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
         self.counter += 1
