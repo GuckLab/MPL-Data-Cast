@@ -8,7 +8,7 @@ import traceback
 import uuid
 from typing import Type, Callable, List
 
-from .util import hashfile, copyhashfile
+from .util import HasherThread, hashfile, copyhashfile
 
 
 #: Files that are not copied (unless specified explicitly by a recipe)
@@ -222,14 +222,29 @@ class Recipe(ABC):
                 success = True
         else:
             # transfer to target_path
+            hash_input_verify = copyhashfile(temp_path, target_path)
+
+            # Compute the hash of the target path *and* the hash of the
+            # input path (you never know) again. We save some time here
+            # by computing the hash in two parallel threads (assuming
+            # disk/network speed is the bottleneck, not the CPU).
+            thr_out = HasherThread(target_path)
+            thr_out.start()
             if hash_input is None:
-                hash_input = copyhashfile(temp_path, target_path)
-            else:
-                shutil.copy2(temp_path, target_path)
-            # compute md5 hash of target path
-            hash_cp = hashfile(target_path)
+                thr_in = HasherThread(temp_path)
+                thr_in.start()
+                thr_in.join()
+                hash_input = thr_in.hash
+            thr_out.join()
+            hash_target = thr_out.hash
+
+            # sanity check
+            assert len(hash_target) == 32
+            assert len(hash_input) == 32
+            assert len(hash_input_verify) == 32
+
             # compare md5 hashes (verification)
-            success = hash_input == hash_cp
+            success = hash_input == hash_target == hash_input_verify
             if not success:
                 # Since we copied the wrong file, we are responsible for
                 # deleting it.

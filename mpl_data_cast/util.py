@@ -3,10 +3,35 @@ import functools
 import hashlib
 import pathlib
 import shutil
+import threading
 from typing import Callable
 
 
 DEFAULT_BLOCK_SIZE = 4 * (1024 ** 2)
+
+
+class HasherThread(threading.Thread):
+    def __init__(self, path, copy_to=None, *args, **kwargs):
+        """Thread for hashing files
+
+        Parameters
+        ----------
+        path: pathlib.Path
+            Path to hash
+        copy_to: pathlib.Path
+            Write data to this file while hashing
+        """
+        super(HasherThread, self).__init__(*args, **kwargs)
+        self.path = path
+        self.copy_to = copy_to
+        self.hash = None
+
+    def run(self):
+        if self.copy_to:
+            self.hash = copyhashfile(path_in=self.path,
+                                     path_out=self.copy_to)
+        else:
+            self.hash = hashfile(self.path)
 
 
 def copyhashfile(path_in: str | pathlib.Path,

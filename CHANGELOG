@@ -1,3 +1,6 @@
+0.6.1
+ - enh: compute the hash of the input file a second time while waiting
+   for the hash of the target file
 0.6.0
  - feat: generalize GUI to use all recipes
  - enh: prevent GUI from locking when transferring large file
