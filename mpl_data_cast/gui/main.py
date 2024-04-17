@@ -150,6 +150,21 @@ class MPLDataCast(QtWidgets.QMainWindow):
                                         "Output directory error",
                                         "Output directory does not exist!")
 
+        # Warn the user when input and output directories are identical.
+        if self.widget_input.path.samefile(self.widget_output.path):
+            ret = QtWidgets.QMessageBox.question(
+                self,
+                "Output and input directories are identical",
+                "You have selected an output directory that is identical to "
+                "the input directory. If you continue, then the files in this "
+                "directory will be <b>replaced</b> according to the recipe "
+                "you chose.<br><br>"
+                "Are you absolutely sure you would like to continue?"
+            )
+            if ret != QtWidgets.QMessageBox.StandardButton.Yes:
+                # Abort
+                return
+
         self.pushButton_transfer.setEnabled(False)
         rp = self.current_recipe(self.widget_input.path,
                                  self.widget_output.path)

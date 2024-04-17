@@ -1,5 +1,6 @@
 0.6.3
  - fix: cleanup temporary directories on startup (#29)
+ - enh: warn user when source and target directory are identical (#28)
 0.6.2
  - setup: bump dclab from 0.55.7 to 0.57.0
 0.6.1
