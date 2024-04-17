@@ -51,15 +51,14 @@ class Recipe(ABC):
         self.path_tar = pathlib.Path(path_tar)
         if not self.path_raw.exists():
             raise ValueError(f"Raw data path '{self.path_raw}' doesn't exist!")
+        temp_root = pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
+        temp_root.mkdir(exist_ok=True, parents=True)
         #: Temporary directory (will be deleted upon application exit)
         self.tempdir = pathlib.Path(
             # Use the current PID as an identifier for the temp dir
             tempfile.mkdtemp(
                 prefix=f"PID-{os.getpid()}-{self.format}_",
-                dir=pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
-            )
-        )
-        self.tempdir.mkdir(exist_ok=True, parents=True)
+                dir=temp_root))
         # Make sure everything is removed in the end.
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
