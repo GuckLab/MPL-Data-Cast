@@ -59,6 +59,7 @@ class Recipe(ABC):
                 dir=pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
             )
         )
+        self.tempdir.mkdir(exist_ok=True, parents=True)
         # Make sure everything is removed in the end.
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
@@ -280,21 +281,22 @@ def cleanup_tmp_dirs():
     # New versions of MPL-Data-Cast, we have this temporary directory for
     # recipes:
     temp_dir = pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
-    for pp in temp_dir.glob("PID-*"):
-        print(pp)
-        try:
-            if pp.is_dir():
-                # Every subdirectory is named according to PID of its process.
-                # If the process does not exist anymore, we may delete it.
-                pid = int(pp.name.split("-")[1])
-                print(pp, pid, psutil.pid_exists(pid))
-                if not psutil.pid_exists(pid):
-                    shutil.rmtree(pp, ignore_errors=True)
-        except BaseException:
-            logger.warning(
-                f"Could not remove stale data {pp} from PID {pid}:\n"
-                f"{traceback.format_exc()}"
-            )
+    if temp_dir.is_dir():
+        for pp in temp_dir.glob("PID-*"):
+            try:
+                if pp.is_dir():
+                    # Every subdirectory is named according to PID of its
+                    # process. If the process does not exist anymore, we
+                    # may delete it.
+                    pid = int(pp.name.split("-")[1])
+                    print(pp, pid, psutil.pid_exists(pid))
+                    if not psutil.pid_exists(pid):
+                        shutil.rmtree(pp, ignore_errors=True)
+            except BaseException:
+                logger.warning(
+                    f"Could not remove stale data {pp} from PID {pid}:\n"
+                    f"{traceback.format_exc()}"
+                )
 
 
 def get_available_recipe_names() -> list[str]:
