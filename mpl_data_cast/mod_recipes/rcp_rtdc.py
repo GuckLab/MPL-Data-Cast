@@ -19,9 +19,18 @@ class RTDCRecipe(Recipe):
         if len(path_list) > 1:
             with dclab.RTDCWriter(temp_path, compression_kwargs=cmp_kw) as hw:
                 for pp in path_list[1:]:
-                    lines = pp.read_text().split("\n")
-                    lines = [ll.rstrip() for ll in lines]
-                    hw.store_log(pp.name, lines)
+                    while True:
+                        # avoid name clashes
+                        ii = 0
+                        log_name = pp.name + f"-{ii}" if ii else pp.name
+                        if log_name in hw.h5file.get("logs", {}):
+                            ii += 1
+                            continue
+                        # write the log file
+                        lines = pp.read_text().split("\n")
+                        lines = [ll.rstrip() for ll in lines]
+                        hw.store_log(log_name, lines)
+                        break
 
     def get_raw_data_iterator(self):
         """Get list of .rtdc files including associated files"""
