@@ -45,7 +45,7 @@ class DummyRecipe(Recipe):
 
 
 def test_cleanup_recipes_new():
-    td = pathlib.Path(tempfile.gettempdir()) / f"MPL-Data-Cast"
+    td = pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
     mypid = os.getpid()
 
     dir1 = td / f"PID-{mypid}-Something_else"
