@@ -1,6 +1,8 @@
 import hashlib
 from abc import ABC, abstractmethod
 import atexit
+import logging
+import os
 import pathlib
 import shutil
 import tempfile
@@ -8,7 +10,12 @@ import traceback
 import uuid
 from typing import Type, Callable, List
 
+import psutil
+
 from .util import HasherThread, hashfile, copyhashfile
+
+
+logger = logging.getLogger(__name__)
 
 
 #: Files that are not copied (unless specified explicitly by a recipe)
@@ -45,7 +52,14 @@ class Recipe(ABC):
         if not self.path_raw.exists():
             raise ValueError(f"Raw data path '{self.path_raw}' doesn't exist!")
         #: Temporary directory (will be deleted upon application exit)
-        self.tempdir = pathlib.Path(tempfile.mkdtemp(prefix="MPL-Data-Cast_"))
+        self.tempdir = pathlib.Path(
+            # Use the current PID as an identifier for the temp dir
+            tempfile.mkdtemp(
+                prefix=f"PID-{os.getpid()}-{self.format}_",
+                dir=pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
+            )
+        )
+        # Make sure everything is removed in the end.
         atexit.register(shutil.rmtree, self.tempdir, ignore_errors=True)
 
     def cast(self, path_callback: Callable = None, **kwargs) -> dict:
@@ -252,6 +266,35 @@ class Recipe(ABC):
         if success and delete_after:
             temp_path.unlink(missing_ok=True)
         return success
+
+
+def cleanup_tmp_dirs():
+    """Removes stale temporary recipe directories"""
+    # In versions <=0.6.2 of MPL-Data-Cast, the temporary files were located
+    # here (If a user installed a newer version of MPL-Data-Cast, then
+    # we can in any case safely remove these directories):
+    for pp in pathlib.Path(tempfile.gettempdir()).glob("MPL-Data-Cast_*"):
+        if pp.is_dir():
+            shutil.rmtree(pp, ignore_errors=True)
+
+    # New versions of MPL-Data-Cast, we have this temporary directory for
+    # recipes:
+    temp_dir = pathlib.Path(tempfile.gettempdir()) / "MPL-Data-Cast"
+    for pp in temp_dir.glob("PID-*"):
+        print(pp)
+        try:
+            if pp.is_dir():
+                # Every subdirectory is named according to PID of its process.
+                # If the process does not exist anymore, we may delete it.
+                pid = int(pp.name.split("-")[1])
+                print(pp, pid, psutil.pid_exists(pid))
+                if not psutil.pid_exists(pid):
+                    shutil.rmtree(pp, ignore_errors=True)
+        except BaseException:
+            logger.warning(
+                f"Could not remove stale data {pp} from PID {pid}:\n"
+                f"{traceback.format_exc()}"
+            )
 
 
 def get_available_recipe_names() -> list[str]:

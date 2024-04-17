@@ -71,6 +71,9 @@ class MPLDataCast(QtWidgets.QMainWindow):
 
         self.show()
         self.raise_()
+
+        # Clean up stale temporary data
+        mpldc_recipe.cleanup_tmp_dirs()
         splash.splash_close()
 
     @property

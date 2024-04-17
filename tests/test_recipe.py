@@ -1,8 +1,12 @@
+import atexit
 import hashlib
+import os
 import pathlib
+import shutil
 import tempfile
+import uuid
 
-from mpl_data_cast import Recipe
+from mpl_data_cast import Recipe, cleanup_tmp_dirs
 
 
 def make_example_data():
@@ -38,6 +42,40 @@ class DummyRecipe(Recipe):
                 if files:
                     data_list.append(files)
         return sorted(data_list)
+
+
+def test_cleanup_recipes_new():
+    td = pathlib.Path(tempfile.gettempdir()) / f"MPL-Data-Cast"
+    mypid = os.getpid()
+
+    dir1 = td / f"PID-{mypid}-Something_else"
+    dir2 = td / "PID-32769-Something_else"
+
+    atexit.register(shutil.rmtree, dir1, ignore_errors=True)
+    atexit.register(shutil.rmtree, dir2, ignore_errors=True)
+
+    dir1.mkdir(exist_ok=True, parents=True)
+    path1 = dir1 / "a.txt"
+    path1.write_text("should not be deleted")
+
+    dir2.mkdir(exist_ok=True, parents=True)
+    path2 = dir2 / "a.txt"
+    path2.write_text("should be deleted")
+
+    cleanup_tmp_dirs()
+
+    assert path1.exists()
+    assert not path2.exists()
+
+
+def test_cleanup_recipes_old():
+    td = pathlib.Path(tempfile.gettempdir()) / f"MPL-Data-Cast_{uuid.uuid4()}"
+    td.mkdir(parents=True, exist_ok=True)
+    path = td / "data.dat"
+    path.write_text("hello world")
+    assert path.exists()
+    cleanup_tmp_dirs()
+    assert not path.exists()
 
 
 def test_pipeline_init():

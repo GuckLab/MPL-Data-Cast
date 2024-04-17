@@ -28,6 +28,7 @@ dependencies = [
     "h5py>=3.8.0",
     "hdf5plugin",  # compression
     "numpy>=1.21",  # CVE-2021-33430
+    "psutil",
     "pyqt6",
     "tifffile==2022.3.16",
 ]
