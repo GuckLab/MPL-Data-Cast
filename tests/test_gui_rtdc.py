@@ -35,16 +35,18 @@ def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
     QtTest.QTest.qWait(100)
 
     data = retrieve_data("rcp_rtdc_mask-contour_2018.zip")
-    test_file = data / "M001_data.rtdc"
-    test_file_dst = tmp_path / "M001_data.rtdc"
-    shutil.copy(test_file, test_file_dst)
-    tmp_dir = tf.TemporaryDirectory()
-    path_out = pathlib.Path(tmp_dir.name)
-    assert tmp_path.exists()
-    assert path_out.exists()
+    tmp_in = tmp_path / "in"
+    tmp_in.mkdir()
+    tmp_out = tmp_path / "out"
+    tmp_out.mkdir()
 
-    mw.widget_input.path = tmp_path
-    mw.widget_output.path = path_out
+    shutil.copytree(data, tmp_in, dirs_exist_ok=True)
+
+    assert tmp_in.is_dir()
+    assert tmp_out.is_dir()
+
+    mw.widget_input.path = tmp_in
+    mw.widget_output.path = tmp_out
 
     bt = mw.pushButton_transfer
 
@@ -54,8 +56,8 @@ def test_transfer_data_simple(qtbot, tmp_path, monkeypatch):
                         lambda *args: QtWidgets.QMessageBox.StandardButton.Ok)
     qtbot.mouseClick(bt, QtCore.Qt.MouseButton.LeftButton)
 
-    assert (path_out / "M001_data.rtdc").exists()
-    tmp_dir.cleanup()
+    assert (tmp_out / "M001_data.rtdc").exists()
+
     mw.close()
     QtTest.QTest.qWait(100)
     QtWidgets.QApplication.processEvents(
