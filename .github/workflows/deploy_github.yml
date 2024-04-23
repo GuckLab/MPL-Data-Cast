@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+env:
+  PYINSTALLER_COMPILE_BOOTLOADER: 1
+
 jobs:
   build:
     name: Create Release
