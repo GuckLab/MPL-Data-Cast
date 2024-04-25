@@ -1,3 +1,5 @@
+0.6.4
+ - setup: compile PyInstaller bootloader for every release
 0.6.3
  - fix: cleanup temporary directories on startup (#29)
  - fix: avoid possible name clashes when storing logs in DC output file
