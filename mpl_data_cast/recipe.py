@@ -96,12 +96,18 @@ class Recipe(ABC):
             except BaseException:
                 errors.append((path_list[0], traceback.format_exc()))
                 continue
-            ok = self.transfer_to_target_path(temp_path=temp_path,
-                                              target_path=targ_path,
-                                              delete_after=True,  # [sic!]
-                                              )
+            try:
+                ok = self.transfer_to_target_path(
+                    temp_path=temp_path,
+                    target_path=targ_path,
+                    delete_after=True,  # [sic!]
+                    )
+            except BaseException:
+                ok = False
+
             if not ok:
-                raise ValueError(f"Transfer to {targ_path} failed!")
+                errors.append((path_list[0], traceback.format_exc()))
+                continue
 
         # Walk the directory tree and copy any other files
         ignored = IGNORED_FILE_NAMES + self.ignored_file_names
@@ -116,12 +122,16 @@ class Recipe(ABC):
                 prel = pp.relative_to(self.path_raw)
                 target_path = self.path_tar / prel
                 target_path.parent.mkdir(parents=True, exist_ok=True)
-                ok = self.transfer_to_target_path(temp_path=pp,
-                                                  target_path=target_path,
-                                                  delete_after=False,  # [sic!]
-                                                  )
+                try:
+                    ok = self.transfer_to_target_path(
+                        temp_path=pp,
+                        target_path=target_path,
+                        delete_after=False,  # [sic!]
+                        )
+                except BaseException:
+                    ok = False
                 if not ok:
-                    raise ValueError(f"Transfer to {target_path} failed!")
+                    errors.append((pp, traceback.format_exc()))
 
         return {
             "success": not bool(errors),
@@ -209,6 +219,7 @@ class Recipe(ABC):
         # Quick check for size (probably a partial transfer)
         if (target_path.exists()
                 and target_path.stat().st_size != temp_path.stat().st_size):
+            logger.info(f"Deleting partial transfer {target_path}")
             # remove target path with mismatch in size
             target_path.unlink()
 
@@ -218,6 +229,7 @@ class Recipe(ABC):
                     hash_input = hashfile(temp_path)
                 # first check the size, then the hash
                 if hashfile(target_path) != hash_input:
+                    logger.info(f"Retrying (checksum mismatch): {target_path}")
                     # The file is not the same, delete it and try again.
                     target_path.unlink()
                     success = Recipe.transfer_to_target_path(
@@ -229,6 +241,7 @@ class Recipe(ABC):
                     )
                 else:
                     # The file is the same, everything is good.
+                    logger.info(f"Already transferred: {target_path}")
                     success = True
             else:
                 # We don't know whether the file is the same, but

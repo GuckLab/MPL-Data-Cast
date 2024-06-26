@@ -1,13 +1,17 @@
 """Utility methods"""
 import functools
 import hashlib
+import logging
 import pathlib
 import shutil
 import threading
+import time
+import traceback
 from typing import Callable
 
 
 DEFAULT_BLOCK_SIZE = 4 * (1024 ** 2)
+logger = logging.getLogger(__name__)
 
 
 class HasherThread(threading.Thread):
@@ -40,6 +44,11 @@ def copyhashfile(path_in: str | pathlib.Path,
                  constructor: Callable = hashlib.md5) -> str:
     """Copy a file while computing its md5sum
 
+    This is the critical code in MPLDC that performs actual
+    data transfer. If the source or the target are locking up
+    (e.g. due to flaky USB drives), then we do our best to
+    still copy the file to the target.
+
     Parameters
     ----------
     path_in:
@@ -52,11 +61,32 @@ def copyhashfile(path_in: str | pathlib.Path,
         Which hash to use
     """
     hasher = constructor()
-    with path_in.open('rb') as fd, path_out.open("wb") as fo:
-        while buf := fd.read(blocksize):
-            hasher.update(buf)
-            fo.write(buf)
-    shutil.copystat(path_in, path_out)
+    num_retries = 3
+    for ii in range(num_retries):
+        try:
+            with path_in.open('rb') as fd, path_out.open("wb") as fo:
+                while buf := fd.read(blocksize):
+                    print(len(buf))
+                    hasher.update(buf)
+                    fo.write(buf)
+        except BaseException:
+            path_out.unlink(missing_ok=True)
+            logger.error(traceback.format_exc())
+            logger.error(f"Retrying {ii+1}/{num_retries}")
+            time.sleep(5)
+            continue
+        else:
+            break
+    else:
+        # Try shutil instead
+        raise ValueError(f"Failed to copy {path_in} to {path_out}")
+
+    try:
+        shutil.copystat(path_in, path_out)
+    except BaseException:
+        # This is not very important
+        pass
+
     return hasher.hexdigest()
 
 
