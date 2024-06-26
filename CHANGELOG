@@ -1,5 +1,6 @@
 0.7.0
  - fix: handle copy errors (retry first, fail better)
+ - fix: handle stat errors when scanning directory tree
  - setup: bump dclab from 0.58.2 to 0.60.0
 0.6.4
  - setup: compile PyInstaller bootloader for every release

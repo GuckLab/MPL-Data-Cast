@@ -1,4 +1,5 @@
 from importlib import resources
+import logging
 import pathlib
 import time
 import threading
@@ -8,6 +9,9 @@ from PyQt6 import QtWidgets, QtCore, QtGui, uic
 
 from ..recipe import IGNORED_FILE_NAMES, map_recipe_name_to_class
 from ..util import is_dir_writable
+
+
+logger = logging.getLogger(__name__)
 
 
 class TreeObjectCounter(threading.Thread):
@@ -79,7 +83,11 @@ class TreeObjectCounter(threading.Thread):
                         # Windows might encounter PermissionError.
                         pass
                     else:
-                        if pp.is_dir() or pp.name in ignored_files:
+                        try:
+                            if pp.is_dir() or pp.name in ignored_files:
+                                continue
+                        except BaseException:
+                            logger.warning(f"Could not stat {pp}")
                             continue
                         with self.lock:
                             # check before incrementing
