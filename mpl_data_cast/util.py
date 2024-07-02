@@ -66,7 +66,6 @@ def copyhashfile(path_in: str | pathlib.Path,
         try:
             with path_in.open('rb') as fd, path_out.open("wb") as fo:
                 while buf := fd.read(blocksize):
-                    print(len(buf))
                     hasher.update(buf)
                     fo.write(buf)
         except BaseException:

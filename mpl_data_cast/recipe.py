@@ -301,7 +301,6 @@ def cleanup_tmp_dirs():
                     # process. If the process does not exist anymore, we
                     # may delete it.
                     pid = int(pp.name.split("-")[1])
-                    print(pp, pid, psutil.pid_exists(pid))
                     if not psutil.pid_exists(pid):
                         shutil.rmtree(pp, ignore_errors=True)
             except BaseException:

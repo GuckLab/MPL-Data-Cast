@@ -70,7 +70,6 @@ class Preferences(QtWidgets.QDialog):
                 value = int(widget.value())
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
-            print(key, value)
             self.settings.setValue(key, value)
 
         # reload UI to give visual feedback
