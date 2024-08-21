@@ -29,13 +29,23 @@ class HasherThread(threading.Thread):
         self.path = path
         self.copy_to = copy_to
         self.hash = None
+        self.error = None
 
     def run(self):
-        if self.copy_to:
-            self.hash = copyhashfile(path_in=self.path,
-                                     path_out=self.copy_to)
-        else:
-            self.hash = hashfile(self.path)
+        for ii in range(3):
+            try:
+                if self.copy_to:
+                    self.hash = copyhashfile(path_in=self.path,
+                                             path_out=self.copy_to)
+                else:
+                    self.hash = hashfile(self.path)
+            except BaseException:
+                self.error = traceback.format_exc()
+                logger.error(self.error)
+                time.sleep(10)
+            else:
+                self.error = None
+                break
 
 
 def copyhashfile(path_in: str | pathlib.Path,

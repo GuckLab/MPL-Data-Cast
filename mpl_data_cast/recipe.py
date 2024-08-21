@@ -262,7 +262,12 @@ class Recipe(ABC):
                 thr_in.start()
                 thr_in.join()
                 hash_input = thr_in.hash
+                if thr_in.error:
+                    raise ValueError(thr_in.error)
+
             thr_out.join()
+            if thr_out.error:
+                raise ValueError(thr_out.error)
             hash_target = thr_out.hash
 
             # sanity check
@@ -276,6 +281,7 @@ class Recipe(ABC):
                 # Since we copied the wrong file, we are responsible for
                 # deleting it.
                 target_path.unlink(missing_ok=True)
+
         if success and delete_after:
             temp_path.unlink(missing_ok=True)
         return success
