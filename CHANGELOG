@@ -1,4 +1,6 @@
 0.7.3
+ - fix: segmentation fault due to mixing threading.Thread with PyQt6
+ - enh: improved logging
  - enh: increased verbosity when encountering exceptions during hash check
 0.7.2
  - fix: remove unnecessary print-calls

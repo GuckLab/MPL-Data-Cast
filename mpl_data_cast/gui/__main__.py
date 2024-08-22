@@ -1,9 +1,17 @@
 def main():
     from importlib import resources
+    import logging
     import sys
     from PyQt6 import QtWidgets, QtCore, QtGui
 
     from .main import MPLDataCast
+    from .._version import version
+
+    logging.basicConfig(
+        level=logging.DEBUG if version.count("post") else logging.INFO,
+        format="%(asctime)s %(levelname)s %(processName)s/%(threadName)s "
+               + "in %(name)s: %(message)s",
+        datefmt='%H:%M:%S')
 
     app = QtWidgets.QApplication(sys.argv)
     ref_ico = resources.files("mpl_data_cast.gui.img") / "mpldc_icon.png"

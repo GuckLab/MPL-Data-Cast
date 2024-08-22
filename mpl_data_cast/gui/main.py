@@ -1,4 +1,5 @@
 from importlib import resources
+import logging
 import time
 import signal
 import pathlib
@@ -17,6 +18,9 @@ from .._version import version
 from . import preferences
 from . import splash
 from . import widget_tree
+
+
+logger = logging.getLogger(__name__)
 
 
 class MPLDataCast(QtWidgets.QMainWindow):
@@ -75,6 +79,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         # Clean up stale temporary data
         mpldc_recipe.cleanup_tmp_dirs()
         splash.splash_close()
+        logger.info("Completed initialization")
 
     @property
     def current_recipe(self):
@@ -97,6 +102,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         """Determine what happens when the user wants to quit"""
         QtCore.QCoreApplication.quit()
 
+    @QtCore.pyqtSlot()
     def on_action_about(self) -> None:
         """Show imprint."""
         gh = "GuckLab/MPL-Data-Cast"
@@ -169,23 +175,28 @@ class MPLDataCast(QtWidgets.QMainWindow):
         rp = self.current_recipe(self.widget_input.path,
                                  self.widget_output.path)
 
+        logger.info(f"Running recipe: {rp}")
+
         tree_counter = self.widget_input.tree_counter
         with CastingCallback(self, tree_counter) as path_callback:
+            path_callback.set_progress_text.connect(self.label_file.setText)
+            path_callback.set_progress_value.connect(self.progressBar.setValue)
+            path_callback.set_progress_mode.connect(self.on_set_progress_mode)
             # run the casting operation in a separate thread
-            caster = CastingThread(rp, path_callback=path_callback)
+            caster = CastingThread(self, rp, path_callback=path_callback)
             caster.start()
 
-        while not caster.result:
+        while caster.isRunning():
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
             time.sleep(.1)
 
-        caster.join()
         result = caster.result
 
         self.widget_output.trigger_recount_objects()
 
         if result["success"]:
+            logger.info("Transfer completed successfully")
             self.progressBar.setValue(100)
             QtWidgets.QMessageBox.information(self, "Transfer completed",
                                               "Data transfer completed.")
@@ -193,9 +204,11 @@ class MPLDataCast(QtWidgets.QMainWindow):
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
         else:
-            msg = "Some problems occured during data transfer:\n"
-            for path, _ in result["errors"]:
+            logger.error(f"Transfer failed:\n{result}")
+            msg = "Some problems occurred during data transfer:\n"
+            for path, _ in result.get("errors", []):
                 msg += f" - {path}\n"
+            msg += result.get("message")
 
             QtWidgets.QMessageBox.information(self, "Error", msg)
 
@@ -206,15 +219,26 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.label_file.setText("")
         self.pushButton_transfer.setEnabled(True)
 
+    @QtCore.pyqtSlot(str)
+    def on_set_progress_mode(self, mode):
+        if mode == "undetermined":
+            self.progressBar.setRange(0, 0)
+        elif mode == "100%":
+            self.progressBar.setRange(0, 100)
 
-class CastingCallback:
+
+class CastingCallback(QtCore.QObject):
     """Makes it possible to execute code everytime a file was processed.
     Used for updating the progress bar and calculating the processing rate."""
+    set_progress_value = QtCore.pyqtSignal(int)
+    set_progress_text = QtCore.pyqtSignal(str)
+    set_progress_mode = QtCore.pyqtSignal(str)  # "undetermined" or "100%"
 
     def __init__(self,
-                 gui: MPLDataCast,
+                 parent: MPLDataCast,
                  tree_counter: widget_tree.TreeObjectCounter):
-        self.gui = gui
+        super(CastingCallback, self).__init__(parent)
+        self.gui = parent
         self.counter = 0
         #: This is a thread running in the background, counting recipe files.
         self.tree_counter = tree_counter
@@ -228,29 +252,35 @@ class CastingCallback:
     def __call__(self, path_list) -> None:
         path = path_list[0]
         # Let the user know where we are
-        self.gui.label_file.setText(f"Processing {path}...")
+        self.set_progress_text.emit(f"Processing {path}...")
 
         if self.tree_counter.has_counted:
             # Let the user know how far we are
-            self.gui.progressBar.setRange(0, 100)
-            self.gui.progressBar.setValue(
+            self.set_progress_mode.emit("100%")
+            self.set_progress_value.emit(
                 int(self.counter / self.tree_counter.num_objects * 100))
+
         else:
             # go to undetermined state
-            self.gui.progressBar.setRange(0, 0)
+            self.set_progress_mode.emit("undetermined")
 
         self.counter += len(path_list)
 
 
-class CastingThread(threading.Thread):
-    def __init__(self, rp, path_callback, *args, **kwargs):
-        super(CastingThread, self).__init__(*args, **kwargs)
+class CastingThread(QtCore.QThread):
+    def __init__(self, parent, rp, path_callback):
+        super(CastingThread, self).__init__(parent)
         self.rp = rp
         self.path_callback = path_callback
         self.result = {}
 
     def run(self):
-        self.result = self.rp.cast(path_callback=self.path_callback)
+        try:
+            self.result = self.rp.cast(path_callback=self.path_callback)
+        except BaseException:
+            self.result = {"success": False,
+                           "message": traceback.format_exc()
+                           }
 
 
 def excepthook(etype, value, trace) -> None:
