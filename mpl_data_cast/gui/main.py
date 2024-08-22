@@ -4,7 +4,6 @@ import time
 import signal
 import pathlib
 import sys
-import threading
 import traceback
 
 import dclab
