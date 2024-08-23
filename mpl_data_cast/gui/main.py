@@ -1,5 +1,6 @@
 from importlib import resources
 import logging
+import os
 import time
 import signal
 import pathlib
@@ -38,6 +39,30 @@ class MPLDataCast(QtWidgets.QMainWindow):
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
             sys.exit(0)
 
+        # Logging output path
+        path_logging = pathlib.Path(
+            QtCore.QStandardPaths.writableLocation(
+                QtCore.QStandardPaths.StandardLocation.TempLocation)
+        ) / "MPLDCUILogs"
+        path_logging.mkdir(parents=True, exist_ok=True)
+        # Remove logs if there are more than 10
+        if len(logs := sorted(path_logging.glob("*.log"))) > 10:
+            for _ in range(len(logs) - 10):
+                try:
+                    logs.pop(-1).unlink()
+                except BaseException:
+                    print(traceback.format_exc())
+        self.log_path = path_logging / time.strftime(
+            "MPLDCUILog_%Y-%m-%d_%H.%M.%S.log", time.localtime())
+        mpldc_logger = logging.getLogger("mpl_data_cast")
+        log_formatter = logging.Formatter(
+            "%(asctime)s %(levelname)s %(processName)s/%(threadName)s "
+            + "in %(name)s: %(message)s")
+        file_handler = logging.FileHandler(self.log_path)
+        file_handler.setFormatter(log_formatter)
+        mpldc_logger.addHandler(file_handler)
+        logging.info(f"Log file: {self.log_path}")
+
         ref_ui = resources.files("mpl_data_cast.gui") / "main.ui"
         with resources.as_file(ref_ui) as path_ui:
             uic.loadUi(path_ui, self)
@@ -65,6 +90,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
         self.actionPreferences.triggered.connect(self.on_action_preferences)
         self.actionQuit.triggered.connect(self.on_action_quit)
         # Help menu
+        self.actionShowLogDirectory.triggered.connect(self.on_action_logshow)
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
 
@@ -84,6 +110,18 @@ class MPLDataCast(QtWidgets.QMainWindow):
     def current_recipe(self):
         name = self.comboBox_recipe.currentData()
         return mpldc_recipe.map_recipe_name_to_class(name)
+
+    @QtCore.pyqtSlot()
+    def on_action_logshow(self):
+        """Show the logging directory to the user"""
+        if os.name == "nt":
+            os.startfile(os.path.normpath(str(self.log_path.parent)))
+        else:
+            QtWidgets.QMessageBox.information(
+                self,
+                "Logging directory",
+                f"The logging directory is located at: {self.log_path.parent}"
+            )
 
     @QtCore.pyqtSlot()
     def on_action_preferences(self):

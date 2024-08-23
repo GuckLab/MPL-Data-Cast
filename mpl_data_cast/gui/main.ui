@@ -53,7 +53,7 @@
          <string>**Recipe:**</string>
         </property>
         <property name="textFormat">
-         <enum>Qt::MarkdownText</enum>
+         <enum>Qt::TextFormat::MarkdownText</enum>
         </property>
        </widget>
       </item>
@@ -66,14 +66,14 @@
          <string>Recipe description goes here.</string>
         </property>
         <property name="textFormat">
-         <enum>Qt::MarkdownText</enum>
+         <enum>Qt::TextFormat::MarkdownText</enum>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -160,7 +160,7 @@
      <x>0</x>
      <y>0</y>
      <width>1142</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -174,6 +174,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionShowLogDirectory"/>
     <addaction name="actionSoftware"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -183,7 +184,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -191,17 +192,22 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionSoftware">
    <property name="text">
-    <string>Software</string>
+    <string>&amp;Software</string>
    </property>
   </action>
   <action name="actionPreferences">
    <property name="text">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="actionShowLogDirectory">
+   <property name="text">
+    <string>Show &amp;Log directory</string>
    </property>
   </action>
  </widget>
