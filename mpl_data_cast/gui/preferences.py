@@ -56,7 +56,7 @@ class Preferences(QtWidgets.QDialog):
                 widget.setText(str(value))
             elif isinstance(widget, QtWidgets.QSpinBox):
                 widget.setValue(int(value))
-            elif isinstance(widget, QtWidgets.QComboBox):
+            elif widget is self.comboBox_recipe:
                 recipe_idx = self.available_recipes.index(str(value))
                 widget.setCurrentIndex(recipe_idx)
             else:
@@ -78,7 +78,7 @@ class Preferences(QtWidgets.QDialog):
             elif isinstance(widget, QtWidgets.QSpinBox):
                 value = int(widget.value())
             elif isinstance(widget, QtWidgets.QComboBox):
-                value = widget.currentText()
+                value = widget.currentData()
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
             self.settings.setValue(key, value)

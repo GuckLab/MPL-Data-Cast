@@ -75,8 +75,12 @@ class MPLDataCast(QtWidgets.QMainWindow):
         for rr in recipes:
             self.comboBox_recipe.addItem(rr, rr)
         # Set recipe according to preferences
-        default = recipes.index(self.settings.value("main/recipe",
-                                                    "CatchAll"))
+        recipe_settings = self.settings.value("main/recipe",
+                                              "CatchAll")
+        if recipe_settings in recipes:
+            default = recipes.index(recipe_settings)
+        else:
+            default = recipes.index("CatchAll")
         self.comboBox_recipe.setCurrentIndex(default)
         self.on_recipe_changed()
 
