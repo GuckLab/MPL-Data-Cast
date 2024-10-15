@@ -4,6 +4,7 @@ import warnings
 
 from PyQt6 import uic, QtCore, QtWidgets
 
+from .. import recipe as mpldc_recipe
 from ..util import is_dir_writable
 
 
@@ -21,10 +22,15 @@ class Preferences(QtWidgets.QDialog):
         self.settings = QtCore.QSettings()
         self.parent = parent
 
+        # Populate the recipe list
+        self.available_recipes = mpldc_recipe.get_available_recipe_names()
+        for rr in self.available_recipes:
+            self.comboBox_recipe.addItem(rr, rr)
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
             ["main/output_path", self.lineEdit_output_path,
              pathlib.Path.home()],
+            ["main/recipe", self.comboBox_recipe, "CatchAll"]
         ]
         self.reload()
 
@@ -50,6 +56,9 @@ class Preferences(QtWidgets.QDialog):
                 widget.setText(str(value))
             elif isinstance(widget, QtWidgets.QSpinBox):
                 widget.setValue(int(value))
+            elif widget is self.comboBox_recipe:
+                recipe_idx = self.available_recipes.index(str(value))
+                widget.setCurrentIndex(recipe_idx)
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
 
@@ -68,6 +77,8 @@ class Preferences(QtWidgets.QDialog):
                         value = str(pathlib.Path.home())
             elif isinstance(widget, QtWidgets.QSpinBox):
                 value = int(widget.value())
+            elif isinstance(widget, QtWidgets.QComboBox):
+                value = widget.currentData()
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
             self.settings.setValue(key, value)
