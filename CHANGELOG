@@ -1,5 +1,6 @@
 0.7.4
  - enh: add user preference for default recipe
+ - setup: bump version of dclab to 0.62.1
 0.7.3
  - fix: segmentation fault due to mixing threading.Thread with PyQt6
  - enh: introduce logging and make logging Path available to the user
