@@ -1,4 +1,5 @@
 0.7.6
+ - fix: handle cases where transfer error message is not given
  - setup: bump version of dclab to 0.62.11
 0.7.5
  - setup: bump version of dclab to 0.62.10

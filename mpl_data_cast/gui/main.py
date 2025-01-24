@@ -250,7 +250,7 @@ class MPLDataCast(QtWidgets.QMainWindow):
             msg = "Some problems occurred during data transfer:\n"
             for path, _ in result.get("errors", []):
                 msg += f" - {path}\n"
-            msg += result.get("message")
+            msg += result.get("message") or "(no additional message)"
 
             QtWidgets.QMessageBox.information(self, "Error", msg)
 
