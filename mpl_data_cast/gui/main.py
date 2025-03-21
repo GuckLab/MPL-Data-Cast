@@ -135,9 +135,6 @@ class MPLDataCast(QtWidgets.QMainWindow):
         dlg = preferences.Preferences(self)
         dlg.setWindowTitle("MPL-Data-Cast Preferences")
         dlg.exec()
-        # set default output path
-        self.widget_output.path = self.settings.value("main/output_path",
-                                                      pathlib.Path.home())
 
     @QtCore.pyqtSlot()
     def on_action_quit(self) -> None:
