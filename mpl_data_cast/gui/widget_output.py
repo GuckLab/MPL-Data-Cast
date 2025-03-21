@@ -1,5 +1,7 @@
 import pathlib
 
+from ..util import is_dir_writable
+
 from .widget_tree import TreeWidget
 
 
@@ -9,5 +11,7 @@ class OutputWidget(TreeWidget):
     def __init__(self, *args, **kwargs):
         super(OutputWidget, self).__init__(which="output", *args, **kwargs)
 
-        self.path = self.settings.value("main/output_path",
-                                        pathlib.Path.home())
+        output_path = self.settings.value("main/output_path")
+        if not is_dir_writable(output_path):
+            output_path = pathlib.Path.home()
+        self.path = pathlib.Path(output_path)

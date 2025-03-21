@@ -175,19 +175,22 @@ def is_dir_writable(path):
     always be some use case where that does not work. So we just try
     to create a file in that directory and be done with it.
     """
-    path = pathlib.Path(path)
-    if not path.exists():
-        writable = False
-    elif path.is_file():
-        writable = False
-    else:
-        test_file = path / ".write_test~"
+    writable = False
+    if path is not None:
+        path = pathlib.Path(path)
         try:
-            test_file.touch()
+            # This may raise WinError 1326 (username or password incorrect)
+            if path.is_dir():
+                test_file = path / ".write_test~"
+                try:
+                    test_file.touch()
+                except BaseException:
+                    logger.warning(f"Directory not writable: '{path}'")
+                else:
+                    logger.info(f"Writable directory: '{path}'")
+                    writable = True
+                finally:
+                    test_file.unlink(missing_ok=True)
         except BaseException:
-            writable = False
-        else:
-            writable = True
-        finally:
-            test_file.unlink(missing_ok=True)
+            logger.warning(f"Cannot stat: '{path}'")
     return writable
